@@ -103,74 +103,9 @@
 
 %CHAPTERS
 
-\input{chapters/Introduction/Introduction.tex}
+\input{chapters/Introduction/chapter.tex}
 
-\section{Algorithm}
-Input to the algorithm is a graph $G=(V, E, C)$ where $V$ is a collection of vertices, $E$ is a collection of edges and $C$ is a collection of pairs of edges that 
-Each edge has a minimum duration dMin and 
 
-\begin{equation}
-\begin{matrix}
-\displaystyle \min_\omega & \omega  \\
-\textrm{s.t.} \\
-& s_i & = & s'_i + q_i \omega & & \forall i \in V \\
-& s_i + d_i & = & s_j + h_{ij} \omega & & \forall i, j \in E \\
-& s'_i + d_i & \leq & s'_j + x_{ij} \omega & & \forall i, j \in C \\
-& x_{ij} + x_{ji} & = & 1 & & \forall i, j \in C \\
-& \underline{d}_i \leq &  d_i & \leq \overline{d}_i & & \forall i \in V \\
-
-\textrm{where:} \\
-& \omega \in \mathbb{R}^+\\
-& s_i, s'_i, d_i \in \mathbb{R}^+\\
-& q_i \in \mathbb{Z}^+\\
-& x_{ij}, h_{ij} \in \{1, 0\} \\
-
-\end{matrix}
-\end{equation}
-
-This model has many problems, mainly the multiplication of $x_{ij}$ and  $\omega$, therefore we use substitution to remove this multiplication of two variables and simplify the model. In the next step the following substitution was applied: $\tau = \frac{1}{\omega}$
-
-\begin{equation}
-\begin{matrix}
-\displaystyle \max_\tau & \tau  \\
-\textrm{s.t.} \\
-& s_i \tau & = & s'_i \tau + q_i & & \forall i \in V \\
-& s_i \tau + d_i \tau & = & s_j \tau + h_{ij} & & \forall i, j \in E \\
-& s'_i \tau + d_i \tau & \leq & s'_j \tau + x_{ij} & & \forall i, j \in C \\
-& x_{ij} + x_{ji} & = & 1 & & \forall i, j \in C \\
-& \underline{d}_i \tau \leq &  d_i \tau & \leq \overline{d}_i \tau & & \forall i \in V \\
-
-\textrm{where:} \\
-& \tau \in \mathbb{R}^+\\
-& s_i, s'_i, d_i \in \mathbb{R}^+\\
-& \tau \in \mathbb{R}^+ \\
-& q_i \in \mathbb{Z}^+\\
-& x_{ij}, h_{ij} \in \{1, 0\} \\
-
-\end{matrix}
-\end{equation}
-
-And finally, after the last substitution $ S_i = s_i \tau $, $ S'_i = s'_i \tau $, $ D_i = d_i \tau $ the following is what is implemented in the plug-in.
-
-\begin{equation}
-\begin{matrix}
-\displaystyle \max_\tau & \tau  \\
-\textrm{s.t.} \\
-& S_i & = & S'_i + q_i & & \forall i \in V \\
-& S_i + D_i & = & S_j + h_{ij} & & \forall i, j \in E \\
-& S'_i + D_i & \leq & S'_j + x_{ij} & & \forall i, j \in C \\
-& x_{ij} + x_{ji} & = & 1 & & \forall i, j \in C \\
-& \underline{d}_i \tau \leq &  D_i & \leq \overline{d}_i \tau & & \forall i \in V \\
-
-\textrm{where:} \\
-& S_i, S'_i, D_i \in \mathbb{R}^+\\
-& \tau \in \mathbb{R}^+ \\
-& q_i \in \mathbb{Z}^+\\
-& x_{ij}, h_{ij} \in \{1, 0\} \\
-
-\end{matrix}
-\end{equation}
-- ILP Model
 
 
 \section{Integration with Process Simulate}
@@ -184,8 +119,7 @@ And finally, after the last substitution $ S_i = s_i \tau $, $ S'_i = s'_i \tau 
 (Osnova detailnejsi, hlidat si navaznost v textu - v teto kapitole popiseme algoritmus ktery jsme definovali v minule kapitole, vyvarovat se citovani wikipedie:D, )
 - 
 
-\section{Conclusion}
-- 
+\input{chapters/Conclusion/chapter.tex}
 
 \section{Literature}
 (zacit sbirat zdroje co nejdrive)
