@@ -74,15 +74,15 @@
 %Declaration and Acknowledgement
 \splitpage{Poděkování / Prohlášení}
 {% Acknowledgement
-V první řadě bych chtěl poděkovat svému vedoucímu, Ph.D. Přemyslu Šůchovi, za poskytnutí konzultací a cenných připomínek.
-Dále bych chtěl poděkovat své rodině za podporu při studiu i behěm psaní této práce.
-V poslední řade děkuji za spolupráci a rady všem členům týmu projektu CashBob.
+	V první řadě bych chtěl poděkovat svému vedoucímu, Ph.D. Přemyslu Šůchovi, za poskytnutí konzultací a cenných připomínek.s
+	Dále bych chtěl poděkovat své rodině za podporu při studiu i behěm psaní této práce.
+	V poslední řade děkuji za spolupráci a rady všem členům týmu.
 }
 {% Declaration
-Prohlašuji, že jsem práci vypracoval samostatně a použil jsem pouze podklady uvedené v~přiloženém seznamu.\\
-Nemám závažný důvod proti užití tohoto školního díla ve smyslu \S 60 Zákona č.~121/2000 Sb., o právu autorském, o právech souvisejících s právem autorským a o změně některých zákonů (autorský zákon).
+	Prohlašuji, že jsem práci vypracoval samostatně a použil jsem pouze podklady uvedené v~přiloženém seznamu.\\
+	Nemám závažný důvod proti užití tohoto školního díla ve smyslu \S 60 Zákona č.~121/2000 Sb., o právu autorském, o právech souvisejících s právem autorským a o změně některých zákonů (autorský zákon).
 \\[15mm]
-V~Praze dne \today \vspace{10mm} \hfill \hbox to 58mm{\tiny\dotfill}
+	V~Praze dne \today \vspace{10mm} \hfill \hbox to 58mm{\tiny\dotfill}
 }
 
 \cleardoublepage
@@ -91,10 +91,10 @@ V~Praze dne \today \vspace{10mm} \hfill \hbox to 58mm{\tiny\dotfill}
 
 \splitpage{Abstrakt / Abstract}
 {
-
+    \input{chapters/Abstract/cs.tex}
 }
 {
-Process Simulate by Siemens is the industry standard in the area of assembly line design. It allows the manufacturers to design and simulate an assembly line long before breaking the ground or ordering the machines that will be used.
+    \input{chapters/Abstract/en.tex}
 }
 
 \pagenumbering{arabic}\setcounter{page}{1}
@@ -103,7 +103,7 @@ Process Simulate by Siemens is the industry standard in the area of assembly lin
 
 %CHAPTERS
 
-\input{chapters/Introduction.tex}
+\input{chapters/Introduction/Introduction.tex}
 
 \section{Algorithm}
 Input to the algorithm is a graph $G=(V, E, C)$ where $V$ is a collection of vertices, $E$ is a collection of edges and $C$ is a collection of pairs of edges that 
@@ -128,7 +128,7 @@ Each edge has a minimum duration dMin and
 \end{matrix}
 \end{equation}
 
-This model has many problems, mainly the multiplication of $x_{ij}$ and  $\omega$, therefore we use substitution to remove this multiplication of two variables and simplify the model. In the next step the following substitution was applied: $\tau = \frac{1}{\omega}$
+This model has many problems, mainly the multiplication of $x_{ij}$ and  $\omega$, therefore we use substitution to remove this multiplication of two variables and simplify the model. In the next step the following substitution was applied: $\tau = \frac{1}{\omega}$
 
 \begin{equation}
 \begin{matrix}
