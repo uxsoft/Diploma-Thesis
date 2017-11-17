@@ -1,0 +1,204 @@
+\documentclass[11pt,twoside,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{minted}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[dvipsnames,hyperref]{xcolor}
+\usepackage{pdfpages}
+\usepackage{caption}
+\usepackage{csquotes}
+\usepackage[style=numeric,citestyle=ieee,hyperref,natbib,backend=biber]{biblatex}
+\addbibresource{reference.bib}
+
+\definecolor{aliceblue}{RGB}{240,248,255}
+\definecolor{wonderland}{RGB}{15,123,196}
+\hypersetup{%
+    colorlinks=true, linktocpage=true, pdfstartpage=1, 
+    pdfstartview=FitV, breaklinks=true, pdfpagemode=UseNone, 
+    pageanchor=true, pdfpagemode=UseOutlines,%
+    plainpages=false, bookmarksnumbered,
+    bookmarksopen=true,%
+    bookmarksopenlevel=1,%
+    hypertexnames=true, pdfhighlight=/O,%
+    urlcolor=wonderland,
+    linkcolor=RoyalBlue, 
+    citecolor=wonderland,%
+    hyperfootnotes=false,pdfpagelabels,
+    pdfsubject={},%
+    pdfkeywords={},%
+    pdfcreator={pdfLaTeX},%
+    pdfproducer={LaTeX}%
+}
+
+\let\tmp\oddsidemargin
+\let\oddsidemargin\evensidemargin
+\let\evensidemargin\tmp
+\reversemarginpar
+
+\input{uxthesis} %Template
+
+\author{Jan Dryk}
+
+\newcommand\Date{\today}
+\newcommand\Department{Katedra počítačů}
+\newcommand\Faculty{Fakulta elektrotechnická}
+\newcommand\University{České vysoké učení technické v Praze}
+\newcommand\labelSupervisor{Vedoucí práce}
+\newcommand\labelStudProgram{Studijní program}
+\newcommand\labelStudBranch{Obor}
+\newcommand\TypeOfWork{Diplomová práce}
+\newcommand\StudProgram{Otevřená informatika}
+\newcommand\StudBranch{Softwarové inženýrství}
+\newcommand\WorkTitle{An extension of  Process Simulate for optimization of robotic cells}
+\newcommand\FirstandFamilyName{Jan Dryk}
+\newcommand\Supervisor{Ph.D. Přemysl Šůcha}
+
+
+\begin{document}
+\pagenumbering{gobble}
+%\includepdf{zadani.pdf}
+\cleardoublepage
+
+\pagenumbering{roman}
+%Title page
+\maketitle
+\cleardoublepage
+%end Title page
+
+%Declaration and Acknowledgement
+\splitpage{Poděkování / Prohlášení}
+{% Acknowledgement
+V první řadě bych chtěl poděkovat svému vedoucímu, Ph.D. Přemyslu Šůchovi, za poskytnutí konzultací a cenných připomínek.
+Dále bych chtěl poděkovat své rodině za podporu při studiu i behěm psaní této práce.
+V poslední řade děkuji za spolupráci a rady všem členům týmu projektu CashBob.
+}
+{% Declaration
+Prohlašuji, že jsem práci vypracoval samostatně a použil jsem pouze podklady uvedené v~přiloženém seznamu.\\
+Nemám závažný důvod proti užití tohoto školního díla ve smyslu \S 60 Zákona č.~121/2000 Sb., o právu autorském, o právech souvisejících s právem autorským a o změně některých zákonů (autorský zákon).
+\\[15mm]
+V~Praze dne \today \vspace{10mm} \hfill \hbox to 58mm{\tiny\dotfill}
+}
+
+\cleardoublepage
+%end Declaration and Acknowledgement
+
+
+\splitpage{Abstrakt / Abstract}
+{
+
+}
+{
+Process Simulate by Siemens is the industry standard in the area of assembly line design. It allows the manufacturers to design and simulate an assembly line long before breaking the ground or ordering the machines that will be used.
+}
+
+\pagenumbering{arabic}\setcounter{page}{1}
+
+\tableofcontents
+
+%CHAPTERS
+
+\input{chapters/Introduction.tex}
+
+\section{Algorithm}
+Input to the algorithm is a graph $G=(V, E, C)$ where $V$ is a collection of vertices, $E$ is a collection of edges and $C$ is a collection of pairs of edges that 
+Each edge has a minimum duration dMin and 
+
+\begin{equation}
+\begin{matrix}
+\displaystyle \min_\omega & \omega  \\
+\textrm{s.t.} \\
+& s_i & = & s'_i + q_i \omega & & \forall i \in V \\
+& s_i + d_i & = & s_j + h_{ij} \omega & & \forall i, j \in E \\
+& s'_i + d_i & \leq & s'_j + x_{ij} \omega & & \forall i, j \in C \\
+& x_{ij} + x_{ji} & = & 1 & & \forall i, j \in C \\
+& \underline{d}_i \leq &  d_i & \leq \overline{d}_i & & \forall i \in V \\
+
+\textrm{where:} \\
+& \omega \in \mathbb{R}^+\\
+& s_i, s'_i, d_i \in \mathbb{R}^+\\
+& q_i \in \mathbb{Z}^+\\
+& x_{ij}, h_{ij} \in \{1, 0\} \\
+
+\end{matrix}
+\end{equation}
+
+This model has many problems, mainly the multiplication of $x_{ij}$ and  $\omega$, therefore we use substitution to remove this multiplication of two variables and simplify the model. In the next step the following substitution was applied: $\tau = \frac{1}{\omega}$
+
+\begin{equation}
+\begin{matrix}
+\displaystyle \max_\tau & \tau  \\
+\textrm{s.t.} \\
+& s_i \tau & = & s'_i \tau + q_i & & \forall i \in V \\
+& s_i \tau + d_i \tau & = & s_j \tau + h_{ij} & & \forall i, j \in E \\
+& s'_i \tau + d_i \tau & \leq & s'_j \tau + x_{ij} & & \forall i, j \in C \\
+& x_{ij} + x_{ji} & = & 1 & & \forall i, j \in C \\
+& \underline{d}_i \tau \leq &  d_i \tau & \leq \overline{d}_i \tau & & \forall i \in V \\
+
+\textrm{where:} \\
+& \tau \in \mathbb{R}^+\\
+& s_i, s'_i, d_i \in \mathbb{R}^+\\
+& \tau \in \mathbb{R}^+ \\
+& q_i \in \mathbb{Z}^+\\
+& x_{ij}, h_{ij} \in \{1, 0\} \\
+
+\end{matrix}
+\end{equation}
+
+And finally, after the last substitution $ S_i = s_i \tau $, $ S'_i = s'_i \tau $, $ D_i = d_i \tau $ the following is what is implemented in the plug-in.
+
+\begin{equation}
+\begin{matrix}
+\displaystyle \max_\tau & \tau  \\
+\textrm{s.t.} \\
+& S_i & = & S'_i + q_i & & \forall i \in V \\
+& S_i + D_i & = & S_j + h_{ij} & & \forall i, j \in E \\
+& S'_i + D_i & \leq & S'_j + x_{ij} & & \forall i, j \in C \\
+& x_{ij} + x_{ji} & = & 1 & & \forall i, j \in C \\
+& \underline{d}_i \tau \leq &  D_i & \leq \overline{d}_i \tau & & \forall i \in V \\
+
+\textrm{where:} \\
+& S_i, S'_i, D_i \in \mathbb{R}^+\\
+& \tau \in \mathbb{R}^+ \\
+& q_i \in \mathbb{Z}^+\\
+& x_{ij}, h_{ij} \in \{1, 0\} \\
+
+\end{matrix}
+\end{equation}
+- ILP Model
+
+
+\section{Integration with Process Simulate}
+- Dev environment
+
+- Modules Classes and their Responsibilities
+
+- Extension the selection of optimization providers
+
+\section{Experiments}
+(Osnova detailnejsi, hlidat si navaznost v textu - v teto kapitole popiseme algoritmus ktery jsme definovali v minule kapitole, vyvarovat se citovani wikipedie:D, )
+- 
+
+\section{Conclusion}
+- 
+
+\section{Literature}
+(zacit sbirat zdroje co nejdrive)
+
+\input{chapters/Algorithms/chapter.tex}
+
+
+\printbibliography
+\appendix
+
+
+\input{appendixes/Abbreviations/chapter.tex}
+\input{appendixes/Manual/chapter.tex}
+\input{appendixes/CDContents/chapter.tex}
+
+\end{document}

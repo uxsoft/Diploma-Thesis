@@ -1,0 +1,63 @@
+\documentclass[11pt,twoside,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{minted}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[dvipsnames,hyperref]{xcolor}
+\usepackage{pdfpages}
+\usepackage{caption}
+\usepackage{csquotes}
+\usepackage[style=numeric,citestyle=ieee,hyperref,natbib,backend=biber]{biblatex}
+\addbibresource{reference.bib}
+
+\definecolor{aliceblue}{RGB}{240,248,255}
+\definecolor{wonderland}{RGB}{15,123,196}
+\hypersetup{%
+    colorlinks=true, linktocpage=true, pdfstartpage=1, 
+    pdfstartview=FitV, breaklinks=true, pdfpagemode=UseNone, 
+    pageanchor=true, pdfpagemode=UseOutlines,%
+    plainpages=false, bookmarksnumbered,
+    bookmarksopen=true,%
+    bookmarksopenlevel=1,%
+    hypertexnames=true, pdfhighlight=/O,%
+    urlcolor=wonderland,
+    linkcolor=RoyalBlue, 
+    citecolor=wonderland,%
+    hyperfootnotes=false,pdfpagelabels,
+    pdfsubject={},%
+    pdfkeywords={},%
+    pdfcreator={pdfLaTeX},%
+    pdfproducer={LaTeX}%
+}
+
+\let\tmp\oddsidemargin
+\let\oddsidemargin\evensidemargin
+\let\evensidemargin\tmp
+\reversemarginpar
+
+\input{uxthesis} %Template
+
+\author{Jan Dryk}
+
+\newcommand\Date{\today}
+\newcommand\Department{Katedra počítačů}
+\newcommand\Faculty{Fakulta elektrotechnická}
+\newcommand\University{České vysoké učení technické v Praze}
+\newcommand\labelSupervisor{Vedoucí práce}
+\newcommand\labelStudProgram{Studijní program}
+\newcommand\labelStudBranch{Obor}
+\newcommand\TypeOfWork{Bakalářská práce}
+\newcommand\StudProgram{Softwarové technologie a management}
+\newcommand\StudBranch{Softwarové inženýrství}
+\newcommand\WorkTitle{Mobilní klient restauračního systému}
+\newcommand\FirstandFamilyName{Jan Dryk}
+\newcommand\Supervisor{Ing. Martin Komárek}
+
+\begin{document}
+\input{appendixes/Manual/chapter.tex}
+\end{document}

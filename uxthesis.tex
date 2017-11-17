@@ -1,0 +1,166 @@
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{titling}
+
+\definecolor{darkaccent}{HTML}{007AC2}
+\definecolor{lightaccent}{HTML}{107AC2}
+
+%page style
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+%section
+\titleformat{\section}
+[hang]
+{\Large\bfseries}
+{
+\color{darkaccent}
+\raisebox{-2pt}{
+    \rule{0.35cm}{1em}
+}
+\color{black}
+\sffamily
+\thesection
+}
+{10pt}
+{
+\color{lightaccent}
+\sffamily
+\Large\bfseries
+}
+ 
+%subsection
+\titleformat{\subsection}
+[hang]
+{\large\bfseries}
+{
+\color{darkaccent}
+\raisebox{-2pt}{
+    \rule{0.35cm}{1em}
+}
+\color{black}
+\sffamily
+\thesubsection
+}
+{10pt}
+{
+\color{lightaccent}
+\sffamily
+\large\bfseries
+}
+
+%subsubsection
+\titleformat{\subsubsection}
+[hang]
+{\normalsize\bfseries}
+{
+    \empty
+}
+{10pt}
+{
+\color{darkaccent}
+\raisebox{-2pt}{
+    \rule{0.35cm}{1em}
+}
+\color{black}
+\sffamily
+\thesubsubsection
+\color{lightaccent}
+\hspace{1em}
+\normalsize\bfseries
+}
+ 
+%chapter
+\titleformat
+{\chapter} 
+[display] 
+{\bfseries\huge} 
+{
+    \color{darkaccent}
+    \raisebox{0em}{
+        \rule{0.35cm}{1em}
+    }
+    \color{black}
+    \sffamily
+    \chaptertitlename \ \Huge\thechapter
+} 
+{-0.75em}
+{
+    \color{darkaccent}
+    \raisebox{-2pt}{
+        \rule{0.35cm}{1.5em}
+    }
+    \sffamily
+    \color{lightaccent}
+}
+
+\renewcommand{\maketitle}
+{
+    \begingroup % Create the command for including the title page in the document
+    \hbox
+    { % Horizontal box
+        \color{darkaccent}
+        \rule{0.35cm}{\textheight} % Vertical line
+        \color{black}
+        \hspace*{0.05\textwidth} % Whitespace between the vertical line and title page text
+        \parbox[b]{0.9\textwidth}
+        { % Paragraph box which restricts text to less than the width of the page
+            
+            \noindent\sffamily\large\textbf{\TypeOfWork}\vspace{\baselineskip}\\
+            
+            \begin{tabular}{lc}
+                \includegraphics[width=3cm]{ctulogo} & 
+                
+                \color{lightaccent}\sffamily\Large\textbf{
+                    \parbox[b]{5cm}{
+                        České \\
+                        vysoké\\
+                        učení technické\\
+                        v Praze
+                    }
+                    \vspace{1em}
+                } \\
+                \Huge\color{lightaccent}\sffamily\textbf{F3} & 
+                \parbox[b]{5cm}{
+                    \textbf{\Faculty} \\
+                    \textbf{\Department}
+                }
+            \end{tabular}
+            \vspace{3cm}
+            
+            \color{lightaccent}\sffamily\huge\textbf{\WorkTitle}\\
+            
+            \Large\color{black}\textbf{\FirstandFamilyName} \\
+            \normalsize\textbf{\StudProgram} \\
+
+            \vspace{6.5cm}
+            
+            \normalsize
+            \textbf{\Date}\\
+            \labelSupervisor: \Supervisor
+        }
+    }
+    \endgroup
+}
+
+\newcommand{\splitpage}[3]{
+    \begingroup
+    \begin{center}
+    \color{lightaccent}\huge\sffamily\centering\textbf{#1}
+    \end{center}
+    \raisebox{0.83\textheight}{\parbox[t]{0.45\textwidth}{
+        #2
+    }}
+    \color{darkaccent}
+    \hspace{1mm}
+    \rule{0.35cm}{0.85\textheight} % Vertical line
+    \hspace{1mm}
+    \color{black}
+    \raisebox{0.83\textheight}{\parbox[t]{0.45\textwidth}{
+        #3
+    }}
+    \endgroup
+}
