@@ -47,23 +47,23 @@
 \author{Jan Dryk}
 
 \newcommand\Date{\today}
-\newcommand\Department{Katedra počítačů}
-\newcommand\Faculty{Fakulta elektrotechnická}
-\newcommand\University{České vysoké učení technické v Praze}
-\newcommand\labelSupervisor{Vedoucí práce}
-\newcommand\labelStudProgram{Studijní program}
-\newcommand\labelStudBranch{Obor}
-\newcommand\TypeOfWork{Diplomová práce}
-\newcommand\StudProgram{Otevřená informatika}
-\newcommand\StudBranch{Softwarové inženýrství}
+\newcommand\Department{Department of Computer Science}
+\newcommand\Faculty{Faculty of Electrical Engineering}
+\newcommand\University{Czech Technical University in Prague}
+\newcommand\SupervisorLabel{Supervisor}
+\newcommand\StudyProgramLabel{Program}
+\newcommand\StudyBranchLabel{Branch}
+\newcommand\TypeOfWork{Diploma Thesis}
+\newcommand\StudyProgram{Open Informatics}
+\newcommand\StudyBranch{Software Engineering}
 \newcommand\WorkTitle{An extension of  Process Simulate for optimization of robotic cells}
-\newcommand\FirstandFamilyName{Jan Dryk}
+\newcommand\Author{Jan Dryk}
 \newcommand\Supervisor{Ph.D. Přemysl Šůcha}
 
 
 \begin{document}
 \pagenumbering{gobble}
-%\includepdf{zadani.pdf}
+\includepdf{zadani.pdf}
 \cleardoublepage
 
 \pagenumbering{roman}
@@ -73,17 +73,25 @@
 %end Title page
 
 %Declaration and Acknowledgement
-\splitpage{Poděkování / Prohlášení}
+\splitpage{Acknowledgement / Declaration}
 {% Acknowledgement
-	V první řadě bych chtěl poděkovat svému vedoucímu, Ph.D. Přemyslu Šůchovi, za poskytnutí konzultací a cenných připomínek.s
-	Dále bych chtěl poděkovat své rodině za podporu při studiu i behěm psaní této práce.
-	V poslední řade děkuji za spolupráci a rady všem členům týmu.
+	First, and foremost I would like to thank my supervisor Ph.D. Přemysl Šůcha for his
+    valuable advice and suggestions while I was writing the thesis as well as for his time.\\
+    
+    I would also like to thank Ing. Libor Bukata for his kind help with my research.\\
+    
+    Last but not least I would like to thank my colleagues, family and friends for their patience
+    and support during the preparation of this thesis. \\
 }
 {% Declaration
-	Prohlašuji, že jsem práci vypracoval samostatně a použil jsem pouze podklady uvedené v~přiloženém seznamu.\\
-	Nemám závažný důvod proti užití tohoto školního díla ve smyslu \S 60 Zákona č.~121/2000 Sb., o právu autorském, o právech souvisejících s právem autorským a o změně některých zákonů (autorský zákon).
-\\[15mm]
-	V~Praze dne \today \vspace{10mm} \hfill \hbox to 58mm{\tiny\dotfill}
+    I declare that the presented work was developed independently and that I have listed
+    all sources of information used within it in accordance with the methodical instructions for
+    observing the ethical principles in the preparation of university theses. \\
+    
+    I agree with the utilisation of the information presented in my thesis pursuant to
+    Copyright Act 121/2000 Coll., Sec. 60. 
+\\[90mm]
+	Prague, \today \vspace{10mm} \hfill \hbox to 58mm{\tiny\dotfill}
 }
 
 \cleardoublepage
@@ -108,18 +116,17 @@
 
 
 
-
-\section{Integration with Process Simulate}
+\input{chapters/Integration/chapter.tex}
+\chapter{Integration with Process Simulate}
 - Dev environment
 
 - Modules Classes and their Responsibilities
 
 - Extension the selection of optimization providers
 
-\section{Experiments}
-Osnova detailnejsi, hlidat si navaznost v textu - v teto kapitole popiseme algoritmus ktery jsme definovali v minule kapitole, vyvarovat se citovani wikipedie:D
 
-asdfgh
+
+\input{chapters/Experiments/chapter.tex}
  
 
 \input{chapters/Conclusion/chapter.tex}

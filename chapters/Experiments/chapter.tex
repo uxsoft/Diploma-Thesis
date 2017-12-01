@@ -1,0 +1,41 @@
+\chapter{Experiments}
+
+Osnova detailnejsi, hlidat si navaznost v textu - v teto kapitole popiseme algoritmus ktery jsme definovali v minule kapitole, vyvarovat se citovani wikipedie:D
+
+
+
+
+To verify the validity of the proposed optimization model 30 problem instances were
+generated, each of them corresponds to a robotic cell with 5 co-operating robots
+where each robot has up to 3 power saving modes (motors, brakes, bus power off).
+
+From 1 to 4 robot configurations are considered for each static activity and in aver-
+age there are approximately 150 activities per instance. The production cycle time
+
+is got by multiplying a lower bound by a factor from 1.05 to 1.40.
+
+The energy optimization problem was formulated as an Integer Linear Program-
+ming problem and solved by using IBM Ilog Cplex 12.6. Gentoo Linux server
+
+equipped with 2 x Intel Xeon E5-2620 v2 @ 2.10 GHz processors and 64 GB mem-
+ory was used for benchmarks.
+
+As the first experiment the influence of Cplex time limit on quality of solutions
+was investigated as shown in Table 4. It was found out that if the solver is given
+2 hours instead of 100 seconds the quality of solutions improves about 3.3 % in
+average. An average gap, which is a relative distance between the best found upper
+bound (the best solution) and the lower bound, was 27.5 % for the two-hour limit.
+The size of the model was roughly about 10000 constraints and 1000 variables.
+
+
+LP SOLVE
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    Complexity & Constraints & Variables & Time \\
+    \hline
+    \input{chapters/Experiments/data.tex}
+    \hline
+\end{tabular}
+\end{center}
