@@ -1,36 +1,14 @@
 \chapter{Experiments}
 
-Osnova detailnejsi, hlidat si navaznost v textu - v teto kapitole popiseme algoritmus ktery jsme definovali v minule kapitole, vyvarovat se citovani wikipedie:D
+The former validation of this work was split into several parts. Due to the complexity of the problem domain not all of the testing and validation could be performed automatically and compared with related works. For this reason user testing was one of the main pillars in this process. \\
 
+Firstly the performance of the included optimization algorithm was tested. For this I developed an algorithm to generate test instances on which the solver could be benchmarked. Then several real test instances were prepared by seasoned engineers in the assembly line design area, illustrating key problems we could encounter in the real world, which was important as this work is focusing on real world application. Lastly the plugin for Process Simulate which I created in this thesis was tested with the users. The main monitored were user experience, speed and mainly the correctness of the results. \\
 
+To verify the validity of the included optimization model 40 problem instances of increasing complexity were randomly generated, each of them corresponds to a robotic cell with $n$ co-operating robots. Each robot has $n + 2$ actions to act out and the overall system includes $n$ collisions. To ensure the instances aren't trivial also $n$ inter-robot dependencies are added. \\
 
+The energy optimization problem was formulated as an Mixed Integer Linear Programming problem. The work allows for easy replacement of the MILP solver, however the presented tests were solved using the open source engine LP_SOLVE \cite{http://lpsolve.sourceforge.net}. The computer running the benchmarks was equipped with Intel Xeon E3-1230v2 @ 3.30 GHz \cite{https://ark.intel.com/products/65732/Intel-Xeon-Processor-E3-1230-v2-8M-Cache-3_30-GHz} and 32 GB of RAM. \\
 
-To verify the validity of the proposed optimization model 30 problem instances were
-generated, each of them corresponds to a robotic cell with 5 co-operating robots
-where each robot has up to 3 power saving modes (motors, brakes, bus power off).
-
-From 1 to 4 robot configurations are considered for each static activity and in aver-
-age there are approximately 150 activities per instance. The production cycle time
-
-is got by multiplying a lower bound by a factor from 1.05 to 1.40.
-
-The energy optimization problem was formulated as an Integer Linear Program-
-ming problem and solved by using IBM Ilog Cplex 12.6. Gentoo Linux server
-
-equipped with 2 x Intel Xeon E5-2620 v2 @ 2.10 GHz processors and 64 GB mem-
-ory was used for benchmarks.
-
-As the first experiment the influence of Cplex time limit on quality of solutions
-was investigated as shown in Table 4. It was found out that if the solver is given
-2 hours instead of 100 seconds the quality of solutions improves about 3.3 % in
-average. An average gap, which is a relative distance between the best found upper
-bound (the best solution) and the lower bound, was 27.5 % for the two-hour limit.
-The size of the model was roughly about 10000 constraints and 1000 variables.
-
-
-LP SOLVE
-
-\begin{center}
+\begin{center}[h]
 \begin{tabular}{|c|c|c|c|}
     \hline
     Complexity & Constraints & Variables & Time \\
@@ -39,3 +17,5 @@ LP SOLVE
     \hline
 \end{tabular}
 \end{center}
+
+TODO User testing \\
