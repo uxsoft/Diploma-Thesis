@@ -1,4 +1,6 @@
 \chapter{Experiments}
+\label{ch:experiments}
+\graphicspath{{chapters/Experiments/}}
 
 The former validation of this work was split into several parts. Due to the complexity of the problem domain not all of the testing and validation could be performed automatically and compared with related works. For this reason user testing was one of the main pillars in this process. \\
 
@@ -6,16 +8,19 @@ Firstly the performance of the included optimization algorithm was tested. For t
 
 To verify the validity of the included optimization model 40 problem instances of increasing complexity were randomly generated, each of them corresponds to a robotic cell with $n$ co-operating robots. Each robot has $n + 2$ actions to act out and the overall system includes $n$ collisions. To ensure the instances aren't trivial also $n$ inter-robot dependencies are added. \\
 
-The energy optimization problem was formulated as an Mixed Integer Linear Programming problem. The work allows for easy replacement of the MILP solver, however the presented tests were solved using the open source engine LP_SOLVE \cite{http://lpsolve.sourceforge.net}. The computer running the benchmarks was equipped with Intel Xeon E3-1230v2 @ 3.30 GHz \cite{https://ark.intel.com/products/65732/Intel-Xeon-Processor-E3-1230-v2-8M-Cache-3_30-GHz} and 32 GB of RAM. \\
+The energy optimization problem was formulated as an Mixed Integer Linear Programming problem. The work allows for easy replacement of the MILP solver, however the presented tests were solved using the open source engine LP\_SOLVE \cite{LPSolve}. The computer running the benchmarks was equipped with Intel Xeon E3-1230v2 @ 3.30 GHz \cite{BeastCPUIntelARK} and 32 GB of RAM. \\
 
-\begin{center}[h]
-\begin{tabular}{|c|c|c|c|}
-    \hline
-    Complexity & Constraints & Variables & Time \\
-    \hline
-    \input{chapters/Experiments/data.tex}
-    \hline
-\end{tabular}
-\end{center}
+\begin{table}[ht]
+    \label{tbl:milpspeed}
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        Complexity & Constraints & Variables & Time \\
+        \hline
+        \input{chapters/Experiments/data.tex}
+        \hline
+    \end{tabular}
+    \caption{MILP Solver Benchmark}
+\end{table}
 
 TODO User testing \\

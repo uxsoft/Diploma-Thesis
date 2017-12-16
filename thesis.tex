@@ -1,15 +1,14 @@
-\documentclass[11pt,twoside,a4paper]{book}
+\documentclass[11pt,twoside,a4paper,dvipsnames,svgnames]{book}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{minted}
+\usepackage{svg}
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{listings}
 \usepackage{graphicx}
 \usepackage{hyperref}
-\usepackage[dvipsnames,hyperref]{xcolor}
 \usepackage{pdfpages}
 \usepackage{caption}
 \usepackage{csquotes}
@@ -19,22 +18,25 @@
 \definecolor{aliceblue}{RGB}{240,248,255}
 \definecolor{wonderland}{RGB}{15,123,196}
 \hypersetup{%
-    colorlinks=true, linktocpage=true, pdfstartpage=1, 
-    pdfstartview=FitV, breaklinks=true, pdfpagemode=UseNone, 
-    pageanchor=true, pdfpagemode=UseOutlines,%
-    plainpages=false, bookmarksnumbered,
+    colorlinks=true, 
+    linktocpage=true,
+    pdfstartpage=1, 
+    pdfstartview=FitV,
+    breaklinks=true,
+    pdfpagemode=UseNone, 
+    pageanchor=true,
+    pdfpagemode=UseOutlines,%
+    plainpages=false,
+    bookmarksnumbered,
     bookmarksopen=true,%
     bookmarksopenlevel=1,%
-    hypertexnames=true, pdfhighlight=/O,%
+    hypertexnames=true,
+    pdfhighlight=/O,%
     urlcolor=wonderland,
     linkcolor=RoyalBlue, 
     citecolor=wonderland,%
-    hyperfootnotes=false,
-    pdfpagelabels,
-    pdfsubject={},%
-    pdfkeywords={},%
-    pdfcreator={pdfLaTeX},%
-    pdfproducer={LaTeX}%
+    %hyperfootnotes=false,
+    %pdfpagelabels
 }
 
 \let\tmp\oddsidemargin
@@ -88,7 +90,7 @@
     all sources of information used within it in accordance with the methodical instructions for
     observing the ethical principles in the preparation of university theses. \\
     
-    I agree with the utilisation of the information presented in my thesis pursuant to
+    I agree with the utilization of the information presented in my thesis pursuant to
     Copyright Act 121/2000 Coll., Sec. 60. 
 \\[90mm]
 	Prague, \today \vspace{10mm} \hfill \hbox to 58mm{\tiny\dotfill}
@@ -114,7 +116,9 @@
 
 \input{chapters/Introduction/chapter.tex}
 
-\input{chapters/Algorithms/chapter.tex}
+\input{chapters/Problem_Statement/chapter.tex}
+
+\input{chapters/MILP_Model/chapter.tex}
 
 \input{chapters/Integration/chapter.tex}
 

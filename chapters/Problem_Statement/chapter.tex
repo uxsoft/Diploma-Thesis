@@ -1,0 +1,35 @@
+\chapter{Problem Statement}
+\label{ch:problem_statement}
+\graphicspath{ {chapters/Problem_Statement/} }
+
+The optimization problem of a robotic cell can be defined as follows.
+There is a set of robots $R = \{ r_1, \dots, r_{\mid R \mid }\} $ and a graph a graph $ G = (V, E, C) $ where its vertices V are operations (welding, moving, painting, waiting \dots
+) and edges which represent relations between the operations. \\
+
+Let $V = \{v_1, \dots, v_{\mid V \mid }\}$, then every operation $v = (D_{min}, D_{max}, r)$ is characteristic by its minimum and maximum duration and the assignment of exactly one robot which is performing it.\\
+
+Edges in the edge set $E = \{v_1, \dots, v_{\mid E \mid }\}$ represent the precedences between operations. 
+Like vertices, an edge $e = (v_{from}, v_{to}, D_{delay}, type)$ also have several properties of its own. 
+Mainly, we recognize three different types of edges. 
+A \emph{robot loop} precedence which stems from the sequential order of the operations in the robots schedule, a \emph{link} which sets precedences between two operations of different robots and last but not least a \emph{robot loop reset} which starts the next cycle. 
+Another property of an edge is the delay $D_{delay} \geq 0$ which is specifying that the following operation $v_{to}$ can start no earlier than $D_{delay}$ seconds after $v_{from}$ has completed in the same cycle. \\
+
+Finally, there is the collision set $C = \{ (v_k, v_l), \dots, (v_m, v_n) \}$ which contains the pairs of operations $(v_i, v_j) \in V^2 : v_i \neq v_j$ that can't be executed at the same time, as this would result in a collision. \\
+
+The goal of the optimization provided in this work is to minimize cycle time. 
+Cycle time, $\omega$, refers to the length of the production cycle. 
+It is the time it takes to complete the production of one unit from start to finish, however when scheduling on parallel resources, some resources can already be working on the next cycle, while others are still finishing the current one.
+Shortening the cycle time is very beneficial as cycle time is indirectly proportional to the number units that can be produced in a given time period.
+
+For example the robotic cell in Figure \ref{fig:examplegraph} has only 2 robots and consists of operations $V = v_1, \dots, v_6$, with robots having 3 operations each. 
+Robot $r_1$ has operations $v_1$ (move around left corner), $v_2$ (weld point 1), $v_3$ (weld point 2). 
+Naturally these three operations need to be performed in sequence, which is ensured by two  \emph{robot loop} which are marked red. 
+When the robot finishes with operation $v_3$ he can start working on the next product coming on the assembly line hence the green \emph{robot loop reset} edge from $v_3$ to $v_1$. 
+Likewise for robot $r2$. Let's say that weld point 1 and 3 are too close together and can't be welded at the same time. A new collision $c \in C$ would be introduced in the graph so that $c = (v_2, v_5)$.
+
+\begin{figure}
+    \centering
+    \includesvg[scale=0.6]{graph}
+    \caption{Graph generated from a simple robotic cell}
+    \label{fig:examplegraph}
+\end{figure}

@@ -1,5 +1,4 @@
 \usepackage{titlesec}
-\usepackage{xcolor}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{titling}
@@ -7,10 +6,27 @@
 \definecolor{darkaccent}{HTML}{007AC2}
 \definecolor{lightaccent}{HTML}{107AC2}
 
+% custom commands
+\newcommand*{\captionsource}[2]{%
+  \caption[{#1}]{%
+    #1%
+    \\\hspace{\linewidth}%
+    \textbf{Source:} #2%
+  }%
+}
+
 %page style
 \pagestyle{fancy}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{14pt} 
+
+%headers
+\fancyhf{}
+\fancyhead[LE,RO]{\leftmark}
+\fancyhead[RE,LO]{}
+\fancyfoot[CE,CO]{\thepage}
+
 
 %section
 \titleformat{\section}

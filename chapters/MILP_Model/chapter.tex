@@ -1,10 +1,18 @@
-\chapter{Algorithms}
-\label{ch:algorithms}
-\graphicspath{{chapters/Algorithms/}}
+\chapter{MILP Model}
+\label{ch:milp_model}
+\graphicspath{{chapters/MILP_Model/}}
 
-\section{Algorithm}
-Input to the algorithm is a graph \(G=(V, E, C)\) where \(V\) is a collection of vertices, $E$ is a collection of edges and $C$ is a collection of pairs of edges that 
-Each edge has a minimum duration dMin and 
+Input to the algorithm is a graph \(G=(V, E, C)\) where \(V\) is a collection of vertices, $E$ is a collection of edges and $C$ is a collection of pairs of edges that could cause collisions if executed simultaneously, as described in the previous chapter. \\
+
+For the purposes of the MILP model we define the following variables. We want to minimize cycle time $\tau$. For operation $i$ we define $s_i$ as the start of the operation and $s'_i$ start of the same operation in a different cycle, which is adjusted by $q_i$ to any cycle. Operations duration is also limited from both sides. From by bottom minimum possible duration $\underline{d}_i$ and from top maximum possible duration $\overline{d}_i$. Between these two constants will be the proposed duration $d_i$. \\
+
+% For edge
+% $h_{ij}$ is 1 if the edge is a \emph{robot loop reset}
+% DWAIT
+
+
+
+
 
 \begin{equation}
 \begin{matrix}
