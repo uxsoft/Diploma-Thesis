@@ -2,77 +2,72 @@
 \label{ch:milp_model}
 \graphicspath{{chapters/MILP_Model/}}
 
-Input to the algorithm is a graph \(G=(V, E, C)\) where \(V\) is a collection of vertices, $E$ is a collection of edges and $C$ is a collection of pairs of edges that could cause collisions if executed simultaneously, as described in the previous chapter. \\
+Input to the algorithm is a graph \(G=(V, E, C)\) where \(V\) is a collection of vertices, $E$ is a collection of edges and $C$ is a set of pairs of edges that could cause collisions if executed simultaneously, as described in the previous chapter. \\
 
-For the purposes of the MILP model we define the following variables. We want to minimize cycle time $\tau$. For operation $i$ we define $s_i$ as the start of the operation and $s'_i$ start of the same operation in a different cycle, which is adjusted by $q_i$ to any cycle. Operations duration is also limited from both sides. From by bottom minimum possible duration $\underline{d}_i$ and from top maximum possible duration $\overline{d}_i$. Between these two constants will be the proposed duration $d_i$. \\
+This is a cyclic scheduling problem with precedences which is know to be NP-hard \cite{SuchaCyclicSchedulingFPGA}
+
+For the purposes of the MILP model we define the following variables. We want to minimize cycle time $\omega$. For operation $v_i$ we define $s_i$ as the start of the operation and $s'_i$ start of the same operation.
+Furthermore, $s'_i$ is a start time of the same operation with respect to cycle time $\omega$. The relation between $s_i$ and $s'_i$ is given by Equation \ref{eq:vertices} where $q_i$ is the index of the execution period.
+Operations duration is also limited from both sides. From by bottom minimum possible duration $\underline{d}_i$ and from top maximum possible duration $\overline{d}_i$. Between these two constants will be the proposed duration $d_i$. \\
+
 
 % For edge
 % $h_{ij}$ is 1 if the edge is a \emph{robot loop reset}
 % DWAIT
 
+Similar model 
+
+\begin{align}
+    \min_\omega\text{ } & \omega  \\
+    \text{s.t. } \\
+        & s_i  =  s'_i + q_i \omega & & \forall i \in V     \label{eq:vertices}\\
+        & s_i + d_i + d^w_i =  s_j + h_{ij} \omega & & \forall i, j \in E \\
+        & s'_i + d_i  \leq  s'_j + x_{ij} \omega & & \forall i, j \in C \\
+        & x_{ij} + x_{ji}  =  1 & & \forall i, j \in C \\
+        & \underline{d}_i \leq  d_i \leq \overline{d}_i & & \forall i \in V \\
+    \text{where:} \\
+        & \omega \in \mathbb{R}^+\\
+        & s_i, s'_i, d_i \in \mathbb{R}^+\\
+        & q_i \in \mathbb{Z}^+\\
+        & x_{ij}, h_{ij} \in \{1, 0\} 
+\end{align}
 
 
 
-
-\begin{equation}
-\begin{matrix}
-\displaystyle \min_\omega & \omega  \\
-\textrm{s.t.} \\
-& s_i & = & s'_i + q_i \omega & & \forall i \in V \\
-& s_i + d_i & = & s_j + h_{ij} \omega & & \forall i, j \in E \\
-& s'_i + d_i & \leq & s'_j + x_{ij} \omega & & \forall i, j \in C \\
-& x_{ij} + x_{ji} & = & 1 & & \forall i, j \in C \\
-& \underline{d}_i \leq &  d_i & \leq \overline{d}_i & & \forall i \in V \\
-
-\textrm{where:} \\
-& \omega \in \mathbb{R}^+\\
-& s_i, s'_i, d_i \in \mathbb{R}^+\\
-& q_i \in \mathbb{Z}^+\\
-& x_{ij}, h_{ij} \in \{1, 0\} \\
-
-\end{matrix}
-\end{equation}
 
 This model has many problems, mainly the multiplication of $x_{ij}$ and  $\omega$, therefore we use substitution to remove this multiplication of two variables and simplify the model. In the next step the following substitution was applied: $\tau = \frac{1}{\omega}$
 
-\begin{equation}
-\begin{matrix}
-\displaystyle \max_\tau & \tau  \\
-\textrm{s.t.} \\
-& s_i \tau & = & s'_i \tau + q_i & & \forall i \in V \\
-& s_i \tau + d_i \tau & = & s_j \tau + h_{ij} & & \forall i, j \in E \\
-& s'_i \tau + d_i \tau & \leq & s'_j \tau + x_{ij} & & \forall i, j \in C \\
-& x_{ij} + x_{ji} & = & 1 & & \forall i, j \in C \\
-& \underline{d}_i \tau \leq &  d_i \tau & \leq \overline{d}_i \tau & & \forall i \in V \\
+\begin{align}
+\max_\tau\text{ } & \tau  \\
+    \text{s.t. } \\
+        & s_i \tau = s'_i \tau + q_i & & \forall i \in V \\
+        & s_i \tau + d_i \tau + d^w_i \tau = s_j \tau + h_{ij} & & \forall i, j \in E \\
+        & s'_i \tau + d_i \tau \leq s'_j \tau + x_{ij} & & \forall i, j \in C \\
+        & x_{ij} + x_{ji} = 1 & & \forall i, j \in C \\
+        & \underline{d}_i \tau \leq  d_i \tau \leq \overline{d}_i \tau & & \forall i \in V \\
+    \text{where:} \\
+        & \tau \in \mathbb{R}^+\\
+        & s_i, s'_i, d_i \in \mathbb{R}^+\\
+        & \tau \in \mathbb{R}^+ \\
+        & q_i \in \mathbb{Z}^+\\
+        & x_{ij}, h_{ij} \in \{1, 0\} 
+\end{align}
 
-\textrm{where:} \\
-& \tau \in \mathbb{R}^+\\
-& s_i, s'_i, d_i \in \mathbb{R}^+\\
-& \tau \in \mathbb{R}^+ \\
-& q_i \in \mathbb{Z}^+\\
-& x_{ij}, h_{ij} \in \{1, 0\} \\
+And finally, after the last substitution $ S_i = s_i \tau $, $ S'_i = s'_i \tau $, $ D_i = d_i \tau $, $D^w_i = d^w_i \tau$ the following is what is implemented in the plug-in.
 
-\end{matrix}
-\end{equation}
+\begin{align}
+    \displaystyle \max_\tau\text{ } & \tau  \\
+    \textrm{s.t. } \\
+        & S_i = S'_i + q_i & & \forall i \in V \\
+        & S_i + D_i + D^w_i = S_j + h_{ij} & & \forall i, j \in E \\
+        & S'_i + D_i \leq S'_j + x_{ij} & & \forall i, j \in C \\
+        & x_{ij} + x_{ji} = 1 & & \forall i, j \in C \\
+        & \underline{d}_i \tau \leq D_i \leq \overline{d}_i \tau & & \forall i \in V \\
+    \text{where:} \\
+        & S_i, S'_i, D_i \in \mathbb{R}^+\\
+        & \tau \in \mathbb{R}^+ \\
+        & q_i \in \mathbb{Z}^+\\
+        & x_{ij}, h_{ij} \in \{1, 0\} 
+\end{align}
 
-And finally, after the last substitution $ S_i = s_i \tau $, $ S'_i = s'_i \tau $, $ D_i = d_i \tau $ the following is what is implemented in the plug-in.
-
-\begin{equation}
-\begin{matrix}
-\displaystyle \max_\tau & \tau  \\
-\textrm{s.t.} \\
-& S_i & = & S'_i + q_i & & \forall i \in V \\
-& S_i + D_i & = & S_j + h_{ij} & & \forall i, j \in E \\
-& S'_i + D_i & \leq & S'_j + x_{ij} & & \forall i, j \in C \\
-& x_{ij} + x_{ji} & = & 1 & & \forall i, j \in C \\
-& \underline{d}_i \tau \leq &  D_i & \leq \overline{d}_i \tau & & \forall i \in V \\
-
-\textrm{where:} \\
-& S_i, S'_i, D_i \in \mathbb{R}^+\\
-& \tau \in \mathbb{R}^+ \\
-& q_i \in \mathbb{Z}^+\\
-& x_{ij}, h_{ij} \in \{1, 0\} \\
-
-\end{matrix}
-\end{equation}
 - ILP Model
