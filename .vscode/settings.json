@@ -15,5 +15,20 @@
         "thesis.log": true,
         "thesis.pdf": true,
         "thesis.synctex.gz": true,
-    }
+    },
+    "latex-workshop.chktex.enabled": true,
+    "latex-workshop.latex.toolchain": [
+      {
+        "command": "texify",
+        "args": [
+          "--synctex",
+          "--pdf",
+          "--tex-option=\"-interaction=nonstopmode\"",
+          "--tex-option=\"-file-line-error\"",
+          "--tex-option=\"-shell-escape\"",
+          "--clean",
+          "thesis.tex"    
+        ]
+      }
+    ],
 }

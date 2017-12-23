@@ -42,6 +42,7 @@ Setting a specific cycle time in seconds will make the MILP model try to match t
 Lastly, the debug option can provide the user with additional information from the MILP solver, explaining the solution, should he have troubles with the proposed schedule. \\
 
 % TODO Class and namespace info
+% TODO Explain why the collisions need to be simulated
 
 When started, the optimization process will first aim to gather data about the root operation. It will first simulate the behavior of the root operation while the robots are set to maximum and minimum speeds to obtain the minimum and maximum duration of the individual child activities.\\
 
@@ -52,7 +53,7 @@ When the process finishes the system will display a helpful report (see Figure \
 \begin{figure}[ht]
 	\caption{Optimization Result Dialog}
 	\centering
-	\includegraphics{}
+	\includegraphics{dialog_optimizationresult}
 	\label{fig:DialogOptimizationResult}
 \end{figure}
 
@@ -91,6 +92,8 @@ Putting together the optimization graph which serves as the model of the study i
 This functionality is being provided by the \emph{GraphVisualizationService} which is located in the \emph{Tecnomatix.Optimization.Services} namespace. It can generate a graph either at bottom-most level of points or one level higher, at the level of paths.
 
 First, the optimization graph is filled with vertexes which are the children of the root operation lying at the desired level, grouped by the robot which is assigned to perform them. In each group, the operations are ordered and a so-called "robot loop" is created, by linking the operations together in pairs, each one with the next. One exception to this rule is the edge between the first and the last operation, which are linked by a "robot loop reset" edge instead.
+
+% spellcheck
 
 The hardest part of the graph creation are the "link" edges which can appear at any level in the operation tree. Since we are flattening the tree into a graph, we need to project them into this new structure. 
 
