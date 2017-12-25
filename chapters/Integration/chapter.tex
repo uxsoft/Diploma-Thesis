@@ -131,7 +131,7 @@ To use the regulator to adjust speeds of an operation we first need to instantia
 
 % How it works
 
-First of all the regulator holds a lower and upper bound for the speed and duration of each operation. These bounds are set to a speed of 1 (minimum) and the speed of 100 (maximum) and the durations observed for those speeds. Similarly to an interpolation search, the regulator will iterate until it finds an acceptable solution or decides that it is impossible or impractical to continue. In the loop, the first action is to make a prediction of the speed based on the upper and lower bounds and the desired duration. At first, I considered linear interpolation (Equation \ref{eq:LinearInterpolationPrediction}), but because the relation isn't linear as shown on Figure \ref{fig:SpeedVsDuration}, binary halving (Equation \ref{eq:BinaryPrediction}) was used instead because it should converge in fewer iterations in most cases.
+First of all the regulator holds a lower and upper bound for the speed and duration of each operation. These bounds are set to a speed of 1 (minimum) and the speed of 100 (maximum) and the durations observed for those speeds. Similarly to an interpolation search, the regulator will iterate until it finds an acceptable solution or decides that it is impossible or impractical to continue. In the loop, the first action is to make a prediction of the speed based on the upper and lower bounds and the desired duration. At first, I considered linear interpolation (Equation \ref{eq:LinearInterpolationPrediction}), but because the relation isn't linear as shown on Figure \ref{fig:SpeedVsDuration}, binary halving (Equation \ref{eq:BinaryPrediction}) was used instead because it should converge in fewer iterations in most cases. \\
 
 \begin{equation} \label{eq:LinearInterpolationPrediction}
     prediction = S_{min} + \frac{D}{D_{max}-D_{min}} \times (S_{max}-S_{min})
@@ -141,10 +141,13 @@ First of all the regulator holds a lower and upper bound for the speed and durat
     prediction = \frac{S_{min} + S_{max}}{2}
 \end{equation}
 
-After the prediction made for all of the blocks which are being adjusted, its tested by a simulation. Based on the result either the upper or the lower bound is adjusted. 
+After the prediction is made for all of the blocks which are being adjusted, they're tested by a simulation. Then, based on the simulations results, either the upper or the lower bound of each block is adjusted. \\
 
 % TODO Rephrase the last sentence and point out this is being done in batches
 % TODO Why not motion time
+% ^ check that
+
+Some readers, aquainted with Process Simulate, might be wondering why we don't convert the movement type of the operation to from joint speed to motion type and write the proposed duration in there. The reason is that the motion type duration only affects the duration of the movement and any OLP commands or welding action take extra time on top of that. Ideally if we could find out the length of the static part we could subtract it and still write the motion type. Alas there is no way to determine the length of the two parts and therefore we can't use that feature and have to ascertain the joint speed by simulation. \\
 
 \subsection{Generator}
 
@@ -152,3 +155,11 @@ After the prediction made for all of the blocks which are being adjusted, its te
 % Class and namespaces
 % How it works
 % Implemented features
+
+The generator piece does as the name suggests. It allows for the programatic generation of random optimization graphs which can be used for automated testing. These graphs are not guaranteed to be feasible. \\
+
+Random graphs can be generated using the \emph{GraphGenerationService} located in the \emph{Tecnomatix.Optimization.Services.Generation} namespace. \\
+
+Input to the routine are three parameters which control the size and density of the graph. The parameters are $robots$ which is the number of robot loops in the graph, $operationsPerRobot$ which specifies the number of operations in each loop $\pm variance$. After this trivial graph is created the process will aim to expand the graph to mirror a real life scenario. An $operationsPerRobot$ random dependencies between robots are inserted and the same amount of collisions are artificially created. \\
+
+% TODO virtual tx representations
