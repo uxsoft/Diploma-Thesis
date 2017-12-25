@@ -30,7 +30,7 @@ The optimization process consists of the main optimization routine and several m
 \begin{figure}[ht]
 	\caption{Begin Optimization Dialog}
 	\centering
-	\includegraphics{dialog_beginoptimization}
+	\includegraphics[width=\textwidth]{dialog_beginoptimization}
 	\label{fig:DialogBeginOptimization}
 \end{figure}
 
@@ -53,7 +53,7 @@ When the process finishes the system will display a helpful report (see Figure \
 \begin{figure}[ht]
 	\caption{Optimization Result Dialog}
 	\centering
-	\includegraphics{dialog_optimizationresult}
+	\includegraphics[width=\textwidth]{dialog_optimizationresult}
 	\label{fig:DialogOptimizationResult}
 \end{figure}
 
@@ -83,24 +83,72 @@ The plugin comes with the following simulations implemented:
 
 \subsection{Graph}
 
-% Class and namespaces
-% How it works
-% Implemented features
-
 Putting together the optimization graph which serves as the model of the study is one of the most fundamental aspects of the optimization process. It takes a compound operation as an input and traverses all of its descendants transforming it into a flat structure. It also has to analyze the dependencies of the operations and how would it operate in a production cycle. \\
 
-This functionality is being provided by the \emph{GraphVisualizationService} which is located in the \emph{Tecnomatix.Optimization.Services} namespace. It can generate a graph either at bottom-most level of points or one level higher, at the level of paths.
+This functionality is being provided by the \emph{GraphVisualizationService} which is located in the \emph{Tecnomatix.Optimization.Services} namespace. It can generate a graph either at bottom-most level of points or one level higher, at the level of paths. For the optimization process used in the point level graph we use the point level graph.\\
 
-First, the optimization graph is filled with vertexes which are the children of the root operation lying at the desired level, grouped by the robot which is assigned to perform them. In each group, the operations are ordered and a so-called "robot loop" is created, by linking the operations together in pairs, each one with the next. One exception to this rule is the edge between the first and the last operation, which are linked by a "robot loop reset" edge instead.
+First, the optimization graph is filled with vertexes which are the children of the root operation lying at the desired level, grouped by the robot which is assigned to perform them. In each group, the operations are ordered and a so-called "robot loop" is created, by linking the operations together in pairs, each one with the next. One exception to this rule is the edge between the first and the last operation, which are linked by a "robot loop reset" edge instead. \\
 
-% spellcheck
+\begin{figure}[ht]
+	\caption{Projection of the operation tree onto a flat layer}
+	\centering
+	\includegraphics[width=1\textwidth]{graphprojection.pdf}
+	\label{fig:GraphProjection}
+\end{figure}
 
 The hardest part of the graph creation are the "link" edges which can appear at any level in the operation tree. Since we are flattening the tree into a graph, we need to project them into this new structure. 
+This process is different whether we flatten to the level of paths or points.  \\
+
+Let’s say that $descendants(x)$ is a function which returns all descendants on the level of paths (for example on Figure \ref{fig:GraphProjection}, if Operation 1 was given as an input to this function, output of the function would be only the children in the frame "Paths"). Next we need to define the function $first(x)$ which returns the first child (a point) of path $x$ and $last(x)$ returns the last child of $x$.\\
+
+In the first case, it is possible to just find all the descendants at the level of paths of the source of the link $l = (source, target)$ and of the target of the link.
+Then we compute the Cartesian product of these two sets $S = descendants(source), T = descendants(target), P = S \times T$. 
+For each item in the set $\forall (from, to) \in P$ we create a new link of type "link" which leads from the vertex $source$ to the vertex $target$ in the graph. 
+These nodes are guaranteed to exist if the link leads inside the root operation. 
+If it leads outside its is ignored because it wouldn't have any impact on the run of the operation. \\
+
+In the latter case, when creating a graph at the level of points, the situation is similar, however, after forming the Cartesian product, we have to select the correct points from the paths. A custom recursive function \emph{ProjectOntoGraph} achieves this. The projection which is a result of the function is illustrated in Figure \ref{fig:GraphProjection}. This function first creates the Cartesian product $P = S \times T$ on the path level, as in the previous case. Then it selects the last or first point $\forall (from, to) \in P: edge = (last(from), first(to))$, depending if the set is coming from a source or a target operation respectively. And then create the corresponding $edge$ in the graph. For example on Figure \ref{fig:GraphProjection} this function would project the blue operation link into the nine purple edges shown in the middle of the diagram.
 
 \subsection{Regulator}
 
+% Intro
+
+The regulator is the main ingredient in the process responsible for taking the output of the optimization and adjusting the operation accordingly. Since how the component works and how its used is very closely tied together, I will explain both in this section. But before we jump to the algorithms we need to realize a few unintuitive facts which we determined experimentally. \\
+
+\begin{figure}[ht]
+	\caption{Relation of operation duration to robot speed}
+	\centering
+	\input{chapters/Integration/OperationDurationVsSpeed.tex}
+	\label{fig:SpeedVsDuration}
+\end{figure}
+
+Firstly, as you can see in Figure \ref{fig:SpeedVsDuration}, the relation between duration, which the optimization algorithm calculates, and speed which we need to set for the robots, isn't linear. Unfortunately, the curve also varies from robot to robot and from operation to operation which means the value can't be calculated at all. This challenge we tackle by using a modified interpolation search with a simulation to check what is the actual duration. \\
+
+The second challenge stems from the fact that movement operations can have different precision associated with them. For example, when moving around a corner when the precision requirements are minimal, we can set the operation zone as "coarse" which will allow the robot to move to the next operation after reaching a region around the point specified by a configured tolerance. As opposed to a "fine" zone which will require the robot to move precisely to the specified point and only then it can advance to the next operation. Due to this, the speed of an operation can influence the following operation, and some operations are effectively skipped which implies that adjusting their speed will not change the duration. To address this, I added an upper bound to the MILP model for the operation duration. An operation which is being skipped will then have $\underline{d} = d = \overline{d}$, consequently the optimization engine won't try to adjust this operations duration and therefore its speed. \\
+
+% Class and namespaces
+To use the regulator to adjust speeds of an operation we first need to instantiate the \emph{OperationDurationRegulator} class located in the \emph{Tecnomatix.Optimization.Services.Regulation} namespace. First, we need to set the desired processing durations of the points which can be achieved by the \emph{SetBlockDuration} method. Please note that the regulator is designed to adjust multiple operations at the same time because the process needs simulations to check that the adjusted speed resulted in the correct duration. Since simulations are by far the most expensive process, it is a good practice to use the least amount of simulations as possible. The regulator can also adjust operations in blocks in case it didn't make sense to adjust the operation individually, but only the cumulative duration was important. In this case, all the operations in the block will be adjusted to the same speed, and the sum of their durations will be matched to the specified desired duration. After the regulator has all the data, we can begin the calibration process by calling the \emph{Adjust} method on the instance of the regulator class. This is a blocking operation due to the fact that the simulations are blocking the UI thread. \\
+
+% How it works
+
+First of all the regulator holds a lower and upper bound for the speed and duration of each operation. These bounds are set to a speed of 1 (minimum) and the speed of 100 (maximum) and the durations observed for those speeds. Similarly to an interpolation search, the regulator will iterate until it finds an acceptable solution or decides that it is impossible or impractical to continue. In the loop, the first action is to make a prediction of the speed based on the upper and lower bounds and the desired duration. At first, I considered linear interpolation (Equation \ref{eq:LinearInterpolationPrediction}), but because the relation isn't linear as shown on Figure \ref{fig:SpeedVsDuration}, binary halving (Equation \ref{eq:BinaryPrediction}) was used instead because it should converge in fewer iterations in most cases.
+
+\begin{equation} \label{eq:LinearInterpolationPrediction}
+    prediction = S_{min} + \frac{D}{D_{max}-D_{min}} \times (S_{max}-S_{min})
+\end{equation}
+
+\begin{equation} \label{eq:BinaryPrediction}
+    prediction = \frac{S_{min} + S_{max}}{2}
+\end{equation}
+
+After the prediction made for all of the blocks which are being adjusted, its tested by a simulation. Based on the result either the upper or the lower bound is adjusted. 
+
+% TODO Rephrase the last sentence and point out this is being done in batches
+% TODO Why not motion time
+
+\subsection{Generator}
+
+% Intro
 % Class and namespaces
 % How it works
 % Implemented features
-
-\
