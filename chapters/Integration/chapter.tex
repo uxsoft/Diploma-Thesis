@@ -43,7 +43,7 @@ In the previous chapter I described what is a command, how to create them and ho
 
 The optimization process consists of the main optimization routine and several modules that provide the required functionality for the algorithm which then glues it together. This chapter will first explain the optimization process and then focus on the supporting modules in the sub-sections. \\
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\caption{Begin Optimization Dialog}
 	\centering
 	\includegraphics{dialog_beginoptimization}
@@ -65,7 +65,7 @@ Then an optimization graph is built by analyzing the operation tree. This graph 
 
 When the process finishes the system will display a helpful report (see Figure~\ref{fig:DialogOptimizationResult}) presenting the most important information about the solution to the user. In the header the cycle time can be found and the body is filled with a graphical representation of the schedule.  
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\caption{Optimization Result Dialog}
 	\centering
 	\includegraphics[width=\textwidth]{dialog_optimizationresult}
@@ -117,7 +117,7 @@ This functionality is being provided by the \class{GraphVisualizationService} wh
 
 First, the optimization graph is filled with vertexes which are the children of the root operation lying at the desired level, grouped by the robot which is assigned to perform them. In each group, the operations are ordered and a so-called "robot loop" is created, by linking the operations together in pairs, each one with the next. One exception to this rule is the edge between the first and the last operation, which are linked by a "robot loop reset" edge instead. \\
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\caption{Projection of the operation tree onto a flat layer}
 	\centering
 	\includegraphics[width=1\textwidth]{graphprojection.pdf}
@@ -143,7 +143,7 @@ In the latter case, when creating a graph at the level of points, the situation 
 
 The regulator is the main ingredient in the process responsible for taking the output of the optimization and adjusting the operation accordingly. Since how the component works and how its used is very closely tied together, I will explain both in this section. But before we jump to the algorithms we need to realize a few unintuitive facts which we determined experimentally. \\
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\caption{Relation of operation duration to robot speed}
 	\centering
 	\input{chapters/Integration/OperationDurationVsSpeed.tex}
