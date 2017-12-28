@@ -7,7 +7,7 @@ Input to the algorithm is a graph \(G=(V, E, C)\) where \(V\) is a collection of
 This is a cyclic scheduling problem with precedences which is know to be NP-hard \cite{SuchaCyclicSchedulingFPGA}
 
 For the purposes of the MILP model we define the following variables. We want to minimize cycle time $\omega$. For operation $v_i$ we define $s_i$ as the start of the operation and $s'_i$ start of the same operation.
-Furthermore, $s'_i$ is a start time of the same operation with respect to cycle time $\omega$. The relation between $s_i$ and $s'_i$ is given by Equation \ref{eq:vertices} where $q_i$ is the index of the execution period.
+Furthermore, $s'_i$ is a start time of the same operation with respect to cycle time $\omega$. The relation between $s_i$ and $s'_i$ is given by Equation~\ref{eq:vertices} where $q_i$ is the index of the execution period.
 Operations duration is also limited from both sides. From by bottom minimum possible duration $\underline{d}_i$ and from top maximum possible duration $\overline{d}_i$. Between these two constants will be the proposed duration $d_i$. \\
 
 

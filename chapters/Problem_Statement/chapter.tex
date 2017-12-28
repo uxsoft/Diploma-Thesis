@@ -21,7 +21,7 @@ Cycle time, $\omega$, refers to the length of the production cycle.
 It is the time it takes to complete the production of one unit from start to finish, however when scheduling on parallel resources, some resources can already be working on the next cycle, while others are still finishing the current one.
 Shortening the cycle time is very beneficial as cycle time is indirectly proportional to the number units that can be produced in a given time period.
 
-For example the robotic cell in Figure \ref{fig:examplegraph} has only 2 robots and consists of operations $V = v_1, \dots, v_6$, with robots having 3 operations each. 
+For example the robotic cell in Figure~\ref{fig:examplegraph} has only 2 robots and consists of operations $V = v_1, \dots, v_6$, with robots having 3 operations each. 
 Robot $r_1$ has operations $v_1$ (move around left corner), $v_2$ (weld point 1), $v_3$ (weld point 2). 
 Naturally these three operations need to be performed in sequence, which is ensured by two  \emph{robot loop} edges which are marked red. 
 When the robot finishes with operation $v_3$ he can start working on the next product coming on the assembly line hence the green \emph{robot loop reset} edge from $v_3$ to $v_1$.

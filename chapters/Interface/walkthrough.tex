@@ -1,4 +1,4 @@
-The usefulness of the Process Simulate application stems from its ability to verify the feasibility of an assembly process before breaking ground. Validating reachability and collision clearance is done by simulating the full assembly sequence of the product and the required instruments \cite{ProcessSimulateProductPage}. Figure \ref{fig:ProcessSimulate} shows a screenshot of the application. \\
+The usefulness of the Process Simulate application stems from its ability to verify the feasibility of an assembly process before breaking ground. Validating reachability and collision clearance is done by simulating the full assembly sequence of the product and the required instruments \cite{ProcessSimulateProductPage}. Figure~\ref{fig:ProcessSimulate} shows a screenshot of the application. \\
 
 To walk the readers through Process Simulate, I put together this rather practical text.
 It includes helpful tips and instructions should the reader want to follow along.
@@ -45,7 +45,7 @@ Finally, the \emph{Geometry} group contains commands to create geometries and un
 
 \subsection{Defining Kinematics}
 Definition of kinematics is the process of defining parts of the model and linking them together with movable joints.
-It is done using the \emph{Kinematics Editor}, which you can see in Figure \ref{fig:KinematicsEditor}. This feature can be accessed using the \emph{Modeling \textgreater Kinematics \textgreater Kinematics Editor} command. \\
+It is done using the \emph{Kinematics Editor}, which you can see in Figure~\ref{fig:KinematicsEditor}. This feature can be accessed using the \emph{Modeling \textgreater Kinematics \textgreater Kinematics Editor} command. \\
 
 \begin{figure}[H]
     \caption{Kinematics Editor}
@@ -64,7 +64,7 @@ Once defined the joint can be tested in the \emph{Joint Jog} dialog. \\
 \subsubsection{Poses}
 A component or a resource can have several predefined poses. 
 A pose is just an assignment of values for each joint which controls how rotated the joint is. 
-Poses can be specified using the \emph{Pose Editor} dialog that has a button in the \emph{Kinematics} group. You can see the \emph{Pose Editor} in Figure \ref{fig:PoseEditor}. Figure \ref{fig:NewPose} shows how to define an new pose.\\
+Poses can be specified using the \emph{Pose Editor} dialog that has a button in the \emph{Kinematics} group. You can see the \emph{Pose Editor} in Figure~\ref{fig:PoseEditor}. Figure~\ref{fig:NewPose} shows how to define an new pose.\\
 
 \begin{figure}[H]
     \caption{Pose Editor}
@@ -100,7 +100,7 @@ Even though it doesn't fit grammatically \emph{CLOSE} is correct without the N a
 Another step in creating tools is to define it as a tool.
 We have already marked the component as a \emph{Gun}, \emph{Gripper} or another tool type, but we still need to assign a TCP. 
 TCP stands for Tool Center Point, and it is a frame where the tool affects the product.
-This dialog, shown in Figure \ref{fig:ToolDefinition}, can be accessed using the \emph{Modeling \textgreater Kinematics \textgreater Tool Definition} command. \\
+This dialog, shown in Figure~\ref{fig:ToolDefinition}, can be accessed using the \emph{Modeling \textgreater Kinematics \textgreater Tool Definition} command. \\
 
 \begin{figure}[H]
     \caption{Tool Definition}
@@ -112,7 +112,7 @@ This dialog, shown in Figure \ref{fig:ToolDefinition}, can be accessed using the
 \subsubsection{Mounting}
 Now the tools are ready to be mounted.
 We can do so using the mount dialog which can be accessed from the context menu (\emph{Right Mouse Button}) on the specific robot we want to mount the tool on and select \emph{Mount Tool}.
-A dialog will be presented, as shown in Figure \ref{fig:MountTool}.
+A dialog will be presented, as shown in Figure~\ref{fig:MountTool}.
 Here, we need to specify what tool we need to mount, using which frame, on which robot and on which frame of the robot respectively.
 Sometimes not all of the frames owned by the tool are displayed under the combo box. 
 If this is the case enter modeling scope of the tool using the \emph{Set Modeling Scope} command and all the frames should now appear. \\
@@ -131,7 +131,7 @@ If for some reason the robot wasn't well defined and doesn't contain a default t
 Last but not least we need to make sure the robot knows which frame to use to alter the product.
 We can do this from the \emph{Robot Properties} dialog which can be accessed from the context menu of the robot by selecting the command with the same name. 
 Here we set the TCP frame equal to the tools TCP frame.
-In Figure \ref{fig:RobotProperties} is a screenshot from this dialog of a correctly configured robot. \\
+In Figure~\ref{fig:RobotProperties} is a screenshot from this dialog of a correctly configured robot. \\
 
 \begin{figure}[H]
     \caption{Robot Properties}
@@ -151,7 +151,7 @@ I'd like to note a pair of them. \\
 The Smart Place feature is located under \emph{Robot \textgreater Reach \textgreater Smart Place}.
 It allows to quickly find places from which the specified robot will be able to reach all the specified points.
 The feature works by making a grid around the robot and doing a reachability test for all the points in the grid.  
-Aforementioned grid can be seen in Figure \ref{fig:SmartPlace}.
+Aforementioned grid can be seen in Figure~\ref{fig:SmartPlace}.
 
 \begin{figure}[H]
     \caption{Smart Place}
@@ -163,7 +163,7 @@ Aforementioned grid can be seen in Figure \ref{fig:SmartPlace}.
 \subsubsection{Reach test}
 The Reach Test feature can be found under \emph{Robot \textgreater Reach \textgreater Reach Test}.
 This feature allows testing given a robot and points out which operations he can or can't reach out of a specified list of operations.
-Figure \ref{fig:ReachTest} pictures the dialog controlling the feature.  \\
+Figure~\ref{fig:ReachTest} pictures the dialog controlling the feature.  \\
 
 \begin{figure}[H]
     \caption{Reach Test}
@@ -189,7 +189,7 @@ It enables to run multiple child operations at the same time or having one opera
 To start managing the timeline the operation needs to be set as a current operation. 
 You can select an operation by highlighting it in the \emph{Operations Tree} and selecting \emph{Set Current Operation} from the mouse context menu or using the keyboard shortcut \emph{Shift + S}. \\
 
-Process Simulate will then populate the \emph{Sequence Editor} panel (see Figure \ref{fig:SequenceEditor}) with information about the newly set current operation. \\
+Process Simulate will then populate the \emph{Sequence Editor} panel (see Figure~\ref{fig:SequenceEditor}) with information about the newly set current operation. \\
 
 \begin{figure}[H]
     \caption{Sequence Editor}
@@ -233,7 +233,7 @@ The robot will then go in order of the atomic operations inside of the weld oper
 \subsection{Detecting Collisions}
 Now that we defined our operations we can talk about simulating operations and detecting any problems that might occur when using that operation in the real world.
 We are already familiar with the \emph{Sequence Editor} panel, of which will take further advantage. Furthermore, we'll explore the \emph{Collision Viewer} panel which is located in the same area.
-Using the \emph{Collision Viewer} panel (see Figure \ref{fig:CollisionViewer}) we need first to define what collisions to check.
+Using the \emph{Collision Viewer} panel (see Figure~\ref{fig:CollisionViewer}) we need first to define what collisions to check.
 Collision checking is a time-consuming process, so the fewer checks we have defined, the faster the simulation will go. \\
 
 \begin{figure}[H]
@@ -244,7 +244,7 @@ Collision checking is a time-consuming process, so the fewer checks we have defi
 \end{figure}
 
 To specify a new check, we use the \emph{New Collision Set} command which can be invoked by the first button in the \emph{Collision Viewer} panel.
-You will be prompted to fill in for collisions of what objects with which objects (usually the robot and the product as depicted in Figure \ref{fig:CollisionViewer}).
+You will be prompted to fill in for collisions of what objects with which objects (usually the robot and the product as depicted in Figure~\ref{fig:CollisionViewer}).
 Note the \emph{Collision Options} command on the \emph{Collision Viewer}; the dialog contains options from tolerances to stop the simulation when a collision is detected.
 Last but not least we need to make sure we have \emph{Collision Mode} enabled. 
 This option is controlled by another button in the \emph{Collision Viewer} panel. \\
