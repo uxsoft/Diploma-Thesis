@@ -14,10 +14,13 @@
 \usepackage{caption}
 \usepackage{csquotes}
 \usepackage{pgfplots}
+\usepackage{float}
+\usepackage{minted}
 \usepackage[style=numeric,citestyle=ieee,hyperref,natbib,backend=biber]{biblatex}
 
 \addbibresource{reference.bib}
 
+\usemintedstyle{vs}
 \pgfplotsset{compat=1.15}
 
 \definecolor{aliceblue}{RGB}{240,248,255}
@@ -67,6 +70,9 @@
 \newcommand\Author{Jan Dryk}
 \newcommand\Supervisor{Ph.D. Přemysl Šůcha}
 
+\hyphenation{
+    IOPti-mi-za-tion-Pro-vi-der
+}
 
 \begin{document}
 \pagenumbering{gobble}
@@ -120,18 +126,14 @@
 %CHAPTERS
 
 \input{chapters/Introduction/chapter.tex}
-
 \input{chapters/Problem_Statement/chapter.tex}
-
 \input{chapters/MILP_Model/chapter.tex}
-
+\input{chapters/Interface/chapter.tex}
 \input{chapters/Integration/chapter.tex}
-
 \input{chapters/Experiments/chapter.tex}
- 
 \input{chapters/Conclusion/chapter.tex}
 
-\section{Literature}
+%\section{Literature}
 
 \printbibliography
 \appendix

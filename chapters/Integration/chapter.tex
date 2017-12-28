@@ -1,27 +1,43 @@
-\chapter{Integration with Process Simulate}
+\chapter{Integration}
 \label{ch:integration}
 \graphicspath{{chapters/Integration/}}
 
-What is process simulate, why we chose it, who uses it and why.
+This chapter focuses on the code written as a part of this thesis. Here I will walk the reader through the integration I implemented, its features, how I achieved it and the reasoning behind the designs. First of all, I'll go through the general architecture of the solution, then explain the features this work brings and then deep dive the essential part, the optimization process.
 
-What it allows us to do
+\section{Architecture}
 
-Introduce compound operations paths and points
+TODO
+ 
+WPF
 
-\section{Writing Plug-ins}
+MVVM
 
-how to write a plugin
+Services
 
-Tools used and why
+unit tests
 
-\section{Plug-in Architecture}
+milpmanager + interchangeability + DI
 
-\section{Plug-in Features}
-How to find it in UI
+Dependency Injection + implement DI of optimization providers
 
-features available
+put all the visualization methods to one place + adjust article
 
-\section{Plug-in Modules}
+\section{Commands}
+
+In the previous chapter I described what is a command, how to create them and how to create them. Installing this plugin into Process Simulate will allow the user to add commands contained in this assembly onto his command bar. The following commands are a part of the plugin.
+
+\begin{itemize}
+    \item Clone Operation. After selecting an existing operation and setting it as active, invoking this command will create a duplicate. The same function will be used for optimization backup. Therefore it's an excellent way to test if the backup is going to meet quality standards. It can also be used to create clones for experimentation without disturbing the primary workspace.
+    
+    \item Optimize Operation. This command is the entry point to the main functionality of the plugin. It displays a dialog to configure and start the optimization process. The process is described in detail in a forthcoming section. 
+    
+    \item Analyze Collisions. This command will run a simulation which analyzes collisions each time-frame. The output of this process is a list of operations that caused collisions which will be displayed on the screen. In contrast to the functionality included in Process Simulate that only provides the user with information about colliding objects.
+    
+    \item Operation Report.  This command will run a simulation which analyzes the active operation and its descendants and produces read-outs of the data. First, a report outlining the energy usage of every robot at every time-frame. Second, a report exposing joint speeds and accelerations of the different robots at every time-frame and finally a report showing the current robot settings. Then the user will be offered to pick file locations to where \emph{csv} files with these three datasets should be created.
+
+    \item Show Optimization Graph. This command strives to demonstrate what the optimization graph looks. It uses the \class{GraphVisualizationService} to construct a model of the operation identical to the one used by the optimization process. It serializes this instance to a Graphviz format and uses \emph{dot.exe} to draw it to an image. Graphviz \cite{Graphviz} needs to be installed on the local machine and the \emph{dot.exe} executable must be in the path for the image to get produced.
+        
+\end{itemize}
 
 \section{Optimization Process}
 
@@ -30,7 +46,7 @@ The optimization process consists of the main optimization routine and several m
 \begin{figure}[ht]
 	\caption{Begin Optimization Dialog}
 	\centering
-	\includegraphics[width=\textwidth]{dialog_beginoptimization}
+	\includegraphics{dialog_beginoptimization}
 	\label{fig:DialogBeginOptimization}
 \end{figure}
 
@@ -41,8 +57,7 @@ The user is also presented with the choice to optionally backup the operation wh
 Setting a specific cycle time in seconds will make the MILP model try to match the cycle time instead of minimizing it.
 Lastly, the debug option can provide the user with additional information from the MILP solver, explaining the solution, should he have troubles with the proposed schedule. \\
 
-% TODO Class and namespace info
-% TODO Explain why the collisions need to be simulated
+The dialog uses the optimization service which is implemented in the \class{OptimizationService} class located in the \namespace{Tecno-ma-tix.Opti-mi-za-tion.Ser-vi-ces.Opti-mi-za-tion} namespace. This service is responsible for the main optimization flow described below. The service has one dependency, and that's an optimization provider (\class{IOptimizationProvider}). Included is the MILP model defined in Chapter \ref{ch:milp_model} which optimizes cycle time. It is implemented in the \class{DefaultOptimizationProvider} class and the service mentioned above defaults to this provider. It can also be swapped out for a different provider which implements the \class{IOptimizationProvider} interface for example for a different criteria function. \\
 
 When started, the optimization process will first aim to gather data about the root operation. It will first simulate the behavior of the root operation while the robots are set to maximum and minimum speeds to obtain the minimum and maximum duration of the individual child activities.\\
 
@@ -59,17 +74,17 @@ When the process finishes the system will display a helpful report (see Figure \
 
 \subsection{Simulation}
 
-The simulation module is a wrapper around the kinematic simulation capability of Process Simulate. It is meant to help with obtaining data about the study which can only be measured. The simulation services are placed in the \emph{Tecnomatix.Optimization.Services.Simulation} and revolve around the \emph{Simulation} class. All new simulations must derive from this class and then can be easily executed. The engine also supports executing multiple simulations simultaneously. \\
+The simulation module is a wrapper around the kinematic simulation capability of Process Simulate. It is meant to help with obtaining data about the study which can only be measured. The simulation services are placed in the \namespace{Tecnomatix.Optimization.Services.Simulation} and revolve around the \class{Simulation} class. All new simulations must derive from this class and then can be easily executed. The engine also supports executing multiple simulations simultaneously. \\
 
 To run a simulation, the system needs an operation as an input. Process Simulate will block the UI and compute the movement of the robots in the scope of the given operation, frame by frame. While simulating the player fires events, which the specific simulation can choose to subscribe to if they are relevant for its purpose. Usually, as the playback progresses, the simulation will store some data which when processed will form the output values. Events available range from the simulation being started or ending, operations beginning and ending to the individual time intervals at which the locations of all the objects within the study are computed. \\
 
-A simulation report is a type of simulation, output of which is a data table. This data can be exported into a \emph{csv} file. Reports are useful for debugging or gaining insight into the performance of the activities within the study.
+A simulation report is a type of simulation, output of which is a data table. This data can be exported into a \emph{csv} file. Reports are useful for debugging or gaining insight into the performance of the activities within the study. \\
 
 The plugin comes with the following simulations implemented:
 
 \begin{itemize}
 
-\item Collision Simulation. This simulation is checking every frame if there is a collision between the specified collision pairs. The collision pairs can be adjusted in the \emph{Collision Viewer} panel in Process Simulate. The simulation will also track down the responsible operations which controlled the parts that collided.
+\item Collision Simulation. This simulation is checking every frame if there is a collision between the specified collision pairs. The collision pairs can be adjusted in the \emph{Collision Viewer} panel in Process Simulate. The simulation will also track down the responsible operations which controlled the parts that collided. This is done by assigning to each operation a set of objects which can be moved by the operation and intersecting them with the set of objects that collided. It is assumed that a collision can happen only between two operation controlled objects, otherwise this is a fault of the robotic cell design which optimization can't fix and the collision is ignored.
 
 \item Energy Report. This report captures the simulated energy usage of the robots. Please note that the readings are only as accurate as the robot controller and using a dedicated controller from the manufacturer of the robots is recommended as the readings given by the default robot controller are inaccurate.
 
@@ -83,9 +98,22 @@ The plugin comes with the following simulations implemented:
 
 \subsection{Graph}
 
+The heart of the optimization process is a model of the problem domain.  We defined this model in Chapter \ref{ch:problem_statement} and the optimization graph is just a set of entities capturing it in code. The \class{OptimizationGraph} class represents the graph as a whole. The vertices and edges also have their classes, those are \class{OptimizationVertex} and \class{OptimizationEdge} respectively. Properties of all of the classes correspond to what we defined in Chapter \ref{ch:problem_statement}. \\
+
+On top of holding data, the \class{OptimizationGraph} class also contains methods for serialization (JSON) and visualization of the graph. Out of the box, there are two visualization options available.
+
+\begin{itemize}
+    \item Graph View. Presented in Figure \ref{fig:examplegraph}, this view is the natural view of the graph. It shows all the edges, vertices, and values of the major properties. This view can be generated by the \class{ExportDiagram} method and uses the \emph{QuickGraph} library for Microsoft .NET to serialize the nodes and relations into a \emph{Graphviz} \cite{Graphviz} \emph{dot} format. The Graphviz library, specifically the \emph{dot.exe} executable is used to turn the graph description into a picture. I chose the Sugiyama-style \cite{GraphvizLayout} hierarchical layout, implemented in the Graphviz library, due to the good quality of the results.
+
+    \item Schedule View. Presented in Figure \ref{fig:DialogOptimizationResult}, this view focuses on the proposed solution. It visualizes the times and durations of the individual operations. In this view, the y-axis shows the different processing units (robots) and the x-axis plots time. It can be generated by the \class{ExportTimeline} method and the diagram is constructed in the HTML format, each operation corresponding to a \emph{div} element with absolute positioning which is calculated based on the proposed duration, proposed start, and the index of the robot associated with the operation. It can be displayed in a dialog by an embedded web browser.
+
+\end{itemize}
+
+\subsection{Graph Builder}
+
 Putting together the optimization graph which serves as the model of the study is one of the most fundamental aspects of the optimization process. It takes a compound operation as an input and traverses all of its descendants transforming it into a flat structure. It also has to analyze the dependencies of the operations and how would it operate in a production cycle. \\
 
-This functionality is being provided by the \emph{GraphVisualizationService} which is located in the \emph{Tecnomatix.Optimization.Services} namespace. It can generate a graph either at bottom-most level of points or one level higher, at the level of paths. For the optimization process used in the point level graph we use the point level graph.\\
+This functionality is being provided by the \class{GraphVisualizationService} which is located in the \namespace{Tecnomatix.Optimization.Services} namespace. It can generate a graph either at bottom-most level of points or one level higher, at the level of paths. For the optimization process used in the point level graph we use the point level graph.\\
 
 First, the optimization graph is filled with vertexes which are the children of the root operation lying at the desired level, grouped by the robot which is assigned to perform them. In each group, the operations are ordered and a so-called "robot loop" is created, by linking the operations together in pairs, each one with the next. One exception to this rule is the edge between the first and the last operation, which are linked by a "robot loop reset" edge instead. \\
 
@@ -107,7 +135,7 @@ For each item in the set $\forall (from, to) \in P$ we create a new link of type
 These nodes are guaranteed to exist if the link leads inside the root operation. 
 If it leads outside its is ignored because it wouldn't have any impact on the run of the operation. \\
 
-In the latter case, when creating a graph at the level of points, the situation is similar, however, after forming the Cartesian product, we have to select the correct points from the paths. A custom recursive function \emph{ProjectOntoGraph} achieves this. The projection which is a result of the function is illustrated in Figure \ref{fig:GraphProjection}. This function first creates the Cartesian product $P = S \times T$ on the path level, as in the previous case. Then it selects the last or first point $\forall (from, to) \in P: edge = (last(from), first(to))$, depending if the set is coming from a source or a target operation respectively. And then create the corresponding $edge$ in the graph. For example on Figure \ref{fig:GraphProjection} this function would project the blue operation link into the nine purple edges shown in the middle of the diagram.
+In the latter case, when creating a graph at the level of points, the situation is similar, however, after forming the Cartesian product, we have to select the correct points from the paths. A custom recursive function \class{ProjectOntoGraph} achieves this. The projection which is a result of the function is illustrated in Figure \ref{fig:GraphProjection}. This function first creates the Cartesian product $P = S \times T$ on the path level, as in the previous case. Then it selects the last or first point $\forall (from, to) \in P: edge = (last(from), first(to))$, depending if the set is coming from a source or a target operation respectively. And then create the corresponding $edge$ in the graph. For example on Figure \ref{fig:GraphProjection} this function would project the blue operation link into the nine purple edges shown in the middle of the diagram.
 
 \subsection{Regulator}
 
@@ -127,7 +155,7 @@ Firstly, as you can see in Figure \ref{fig:SpeedVsDuration}, the relation betwee
 The second challenge stems from the fact that movement operations can have different precision associated with them. For example, when moving around a corner when the precision requirements are minimal, we can set the operation zone as "coarse" which will allow the robot to move to the next operation after reaching a region around the point specified by a configured tolerance. As opposed to a "fine" zone which will require the robot to move precisely to the specified point and only then it can advance to the next operation. Due to this, the speed of an operation can influence the following operation, and some operations are effectively skipped which implies that adjusting their speed will not change the duration. To address this, I added an upper bound to the MILP model for the operation duration. An operation which is being skipped will then have $\underline{d} = d = \overline{d}$, consequently the optimization engine won't try to adjust this operations duration and therefore its speed. \\
 
 % Class and namespaces
-To use the regulator to adjust speeds of an operation we first need to instantiate the \emph{OperationDurationRegulator} class located in the \emph{Tecnomatix.Optimization.Services.Regulation} namespace. First, we need to set the desired processing durations of the points which can be achieved by the \emph{SetBlockDuration} method. Please note that the regulator is designed to adjust multiple operations at the same time because the process needs simulations to check that the adjusted speed resulted in the correct duration. Since simulations are by far the most expensive process, it is a good practice to use the least amount of simulations as possible. The regulator can also adjust operations in blocks in case it didn't make sense to adjust the operation individually, but only the cumulative duration was important. In this case, all the operations in the block will be adjusted to the same speed, and the sum of their durations will be matched to the specified desired duration. After the regulator has all the data, we can begin the calibration process by calling the \emph{Adjust} method on the instance of the regulator class. This is a blocking operation due to the fact that the simulations are blocking the UI thread. \\
+To use the regulator to adjust speeds of an operation we first need to instantiate the \class{OperationDurationRegulator} class located in the \namespace{Tecnomatix.Optimization.Services.Regulation} namespace. First, we need to set the desired processing durations of the points which can be achieved by the \class{SetBlockDuration} method. Please note that the regulator is designed to adjust multiple operations at the same time because the process needs simulations to check that the adjusted speed resulted in the correct duration. Since simulations are by far the most expensive process, it is a good practice to use the least amount of simulations as possible. The regulator can also adjust operations in blocks in case it didn't make sense to adjust the operation individually, but only the cumulative duration was important. In this case, all the operations in the block will be adjusted to the same speed, and the sum of their durations will be matched to the specified desired duration. After the regulator has all the data, we can begin the calibration process by calling the \class{Adjust} method on the instance of the regulator class. This is a blocking operation due to the fact that the simulations are blocking the UI thread. \\
 
 % How it works
 
@@ -141,25 +169,16 @@ First of all the regulator holds a lower and upper bound for the speed and durat
     prediction = \frac{S_{min} + S_{max}}{2}
 \end{equation}
 
-After the prediction is made for all of the blocks which are being adjusted, they're tested by a simulation. Then, based on the simulations results, either the upper or the lower bound of each block is adjusted. \\
+After the algorithm makes predictions for the whole batch, the next step is to modify the joint speed of all the operations in the blocks based on the projections and test them with a simulation. Based on the results of the simulation, either the upper or the lower bound of each block is modified. \\
 
-% TODO Rephrase the last sentence and point out this is being done in batches
-% TODO Why not motion time
-% ^ check that
-
-Some readers, aquainted with Process Simulate, might be wondering why we don't convert the movement type of the operation to from joint speed to motion type and write the proposed duration in there. The reason is that the motion type duration only affects the duration of the movement and any OLP commands or welding action take extra time on top of that. Ideally if we could find out the length of the static part we could subtract it and still write the motion type. Alas there is no way to determine the length of the two parts and therefore we can't use that feature and have to ascertain the joint speed by simulation. \\
+Some readers, acquainted with Process Simulate, might be wondering why we don't convert the movement kind of the operation from joint speed to motion type and write the proposed duration in there. The reason is that the motion type duration only affects the period of the movement, and any OLP commands or welding action take extra time on top of that. Ideally, if we could find out the length of the static part, we could subtract it from the total duration, and still write out the times as motion type. Alas, there is no way to determine the length of the two distinct parts, and therefore we can't use that feature and have to discover the joint speed by simulation. \\
 
 \subsection{Generator}
 
-% Intro
-% Class and namespaces
-% How it works
-% Implemented features
+The generator piece does as the name suggests. It allows for the programmatic generation of random optimization graphs which can be used for automated testing. These graphs are not guaranteed to be feasible. \\
 
-The generator piece does as the name suggests. It allows for the programatic generation of random optimization graphs which can be used for automated testing. These graphs are not guaranteed to be feasible. \\
+Random graphs can be generated using the \class{GraphGenerationService} located in the \namespace{Tecnomatix.Optimization.Services.Generation} namespace. \\
 
-Random graphs can be generated using the \emph{GraphGenerationService} located in the \emph{Tecnomatix.Optimization.Services.Generation} namespace. \\
+The inputs to the routine are three parameters which control the size and density of the graph. The variables are $robots$ which is the number of robot loops, $operationsPerRobot$ which specifies the number of operations in each loop $\pm variance$. After this trivial graph is created, the process aims to expand the model to mirror a real-life scenario. A number of random dependencies between robots are inserted (equal to $operationsPerRobot$), and the same amount of collisions are artificially constructed to complicate the graph. \\
 
-Input to the routine are three parameters which control the size and density of the graph. The parameters are $robots$ which is the number of robot loops in the graph, $operationsPerRobot$ which specifies the number of operations in each loop $\pm variance$. After this trivial graph is created the process will aim to expand the graph to mirror a real life scenario. An $operationsPerRobot$ random dependencies between robots are inserted and the same amount of collisions are artificially created. \\
-
-% TODO virtual tx representations
+Ordinarily, the graph vertices are linked to Tecnomatix representations of the operations and robots so this time they are replaced by virtual operations and robots so that most processes can function with this graph. \\

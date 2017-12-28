@@ -2,9 +2,11 @@
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{titling}
+\usepackage{xstring}
 
 \definecolor{darkaccent}{HTML}{007AC2}
 \definecolor{lightaccent}{HTML}{107AC2}
+\urlstyle{same}
 
 % custom commands
 \newcommand*{\captionsource}[2]{%
@@ -176,4 +178,19 @@
         #3
     }}
     \endgroup
+}
+
+\newcommand{\class}[1]{
+    \emph{#1}
+}
+
+\newcommand{\namespace}[1]{
+    \StrSubstitute{#1}{-}{\-}[\namespacename]
+    \emph{\StrSubstitute{\namespacename}{.}{.\-}}
+}
+
+\newcommand{\cls}[1]{
+    \StrSubstitute{#1}{/}{\backslash\-}[\clscontent]
+    \StrSubstitute{\clscontent}{-}{\-}[\clscontent]
+    \emph{\StrSubstitute{\clscontent}{.}{.\-}}
 }
