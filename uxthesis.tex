@@ -181,16 +181,15 @@
 }
 
 \newcommand{\class}[1]{
-    \emph{#1}
+    \cls{#1}
 }
 
 \newcommand{\namespace}[1]{
-    \StrSubstitute{#1}{-}{\-}[\namespacename]
-    \emph{\StrSubstitute{\namespacename}{.}{.\-}}
+    \cls{#1}
 }
 
 \newcommand{\cls}[1]{
-    \StrSubstitute{#1}{/}{\backslash\-}[\clscontent]
+    \StrSubstitute{#1}{/}{$\backslash$\-}[\clscontent]
     \StrSubstitute{\clscontent}{-}{\-}[\clscontent]
     \emph{\StrSubstitute{\clscontent}{.}{.\-}}
 }

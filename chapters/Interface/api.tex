@@ -5,7 +5,7 @@ Any .NET assembly can be a Process Simulate plugin, as it only looks at the cont
 A class library project is ideal for this as there is no benefit for any other project type. 
 For Process Simulate to pick up the assembly, it should be located in \emph{DotNetCommands} or \emph{DotNetExternalApplications} directories and registered with the application. 
 These directories and any following paths are relative to the programs installation directory. 
-Typically this would be \cls{C:\Program Files\Tecnomatix 13.0\eMPower}, but might differ based on the user's choice at install-time.
+Typically this would be \cls{C:/Program Files/Tecnomatix 13.0/eMPower}, but might differ based on the user's choice at install-time.
 
 To register an external application or a command with Process Simulate, we need to use a utility \emph{CommandReg.exe} which comes with the application. When you launch the program a dialog, similar to the one presented in Figure \ref{fig:CommandReg}, will appear. In this dialog we select the compiled file, we want to load, pick the commands located in the assembly and choose a filename for the configuration XML file which will be newly created. This XML allows the settings to be moved between computers easily. \\
 
