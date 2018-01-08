@@ -2,40 +2,59 @@
 \label{ch:integration}
 \graphicspath{{chapters/Integration/}}
 
-This chapter focuses on the code written as a part of this thesis. Here I will walk the reader through the integration I implemented, its features, how I achieved it and the reasoning behind the designs. First of all, I'll go through the general architecture of the solution, then explain the features this work brings and then deep dive the essential part, the optimization process.
+This chapter focuses on the plugin, how it works and how it was developed. 
+Here I will walk the reader through the integration I implemented, its features, how I achieved it and the reasoning behind the design. 
+First of all, I'll go through the general architecture of the solution, then explain the features this work brings and then deep dive into the essential part, the optimization process.
 
 \section{Architecture}
 
-TODO
+The plugin is written in Microsoft.NET Framework using C\# in Microsoft Visual Studio 2017. I chose this language out of all the possibilities compatible with the Tecnomatix API because I like the enterprise strategy Microsoft has taken with it. As such it pushes the users to write scalable and maintainable applications. I used the best practices in the industry to push the boundaries of readability of the code and straightforward extensibility as this was one of the goals. \\
  
-WPF
+The user interface of the plugin, which is just a few dialogs, is built using WPF (Windows Presentation Foundation). 
+This technology is the state of the art for building UI on the Microsoft Windows operating system. 
+It uses an XML based language called XAML to define the object tree of the UI elements. 
+It supports hardware acceleration, animations, data templates and more out of the box.
+With each component, there isn't only a XAML file but also a so-called "code-behind" file which is standard C\#. In the code-behind, we can use code to specify behavior which the XAML language can't express, or it would be too verbose. \\
 
-MVVM
+WPF is tightly bound together with the MVVM architectural design pattern which was developed by Microsoft employees specifically for WPF.
+It was since recognized by the developer community as a significant pattern in UI design and ported to many other languages and frameworks.
+The MVVM pattern says that Views, which we can think of as screens or dialogues and correspond to the WPF components, are controlled by so-called View Models. 
+This way we can have multiple Views for different screen sizes or places in the application, but share the same business logic which is located in the View Model. 
+View Models also bind the Models and the Views together. 
+Models hold our data which the Views present to the user. \\
 
-Services
+One thing the pattern doesn't talk about, but can't live without are services. 
+Service is a part of the functionality which provides access to or implements capabilities of the application which the business logic can then use.
+There are multiple ways to define services, depending on the content and needs of the application.
+The simplest way is to define services as static classes. 
+That is only possible if the services don't need configuration.
+If they do, the standard way of handling this problem is to use dependency injection to manage our services.
+Business logic specifies its dependencies and an IOC container will inject them.
+We call this principle Inversion of Control (IOC) because the business logic is no longer in control and only specifies its requirements which the container aims to satisfy.
+In this model, it's the responsibility of the IOC container to manage the configuration and in some cases auto-discover the services.
+The last recommendation is to use interfaces for services so that the business logic isn't dependant on a single implementation and the IOC container can choose between different implementations the one best suited for the situation. \\
 
-unit tests
-
-milpmanager + interchangeability + DI
-
-Dependency Injection + implement DI of optimization providers
-
-put all the visualization methods to one place + adjust article
+While in this work I chose to go the purer route of static services as I didn't have any advanced requirements I'd like to exhibit an example of this good practice from an external code-base. 
+Instead of using a MILP solver directly, tying the code to a specific implementation like Gurobi \cite{Gurobi}, I used an abstraction over MILP solvers in general. 
+Because of this I could use an open-source solver like LP\_SOLVE \cite{LPSolve} or Google OrTools \cite{GoogleOrTools} and have confidence that when a more complicated MILP model comes, the solver can be quickly swapped for a more sophisticated solver like Gurobi \cite{Gurobi} or CPLEX \cite{CPLEX}.
 
 \section{Commands}
 
-In the previous chapter I described what is a command, how to create them and how to create them. Installing this plugin into Process Simulate will allow the user to add commands contained in this assembly onto his command bar. The following commands are a part of the plugin.
+In the previous chapter, I described what a command is, how to develop them and how to add them to the ribbon menu. 
+Installing this plugin into Process Simulate will allow the user to add commands contained in this assembly onto his command bar. The following commands are a part of the plugin.
 
 \begin{itemize}
-    \item Clone Operation. After selecting an existing operation and setting it as active, invoking this command will create a duplicate. The same function will be used for optimization backup. Therefore it's an excellent way to test if the backup is going to meet quality standards. It can also be used to create clones for experimentation without disturbing the primary workspace.
+    \item \emph{Clone Operation.} After selecting an existing operation and setting it as active, invoking this command will create a deep copy. The same function will be used for optimization backup. Therefore it's an excellent way to test if the backup is going to meet quality standards. It can also be used to create clones for experimentation without disturbing the primary workspace. This capability was implemented using the internal API used for the drag \& drop functionality of Process Simulate.
     
-    \item Optimize Operation. This command is the entry point to the main functionality of the plugin. It displays a dialog to configure and start the optimization process. The process is described in detail in a forthcoming section. 
+    \item \emph{Optimize Operation.} This command is the entry point to the main functionality of the plugin. It displays a dialog to configure and start the optimization process. The process is described in detail in a forthcoming section. 
     
-    \item Analyze Collisions. This command will run a simulation which analyzes collisions each time-frame. The output of this process is a list of operations that caused collisions which will be displayed on the screen. In contrast to the functionality included in Process Simulate that only provides the user with information about colliding objects.
+    \item \emph{Analyze Collisions.} This command will run a simulation which analyzes collisions each time-frame. The output of this process is a list of operations that caused collisions which will be displayed on the screen. In contrast to the functionality included in Process Simulate that only provides the user with information about colliding objects.
     
-    \item Operation Report.  This command will run a simulation which analyzes the active operation and its descendants and produces read-outs of the data. First, a report outlining the energy usage of every robot at every time-frame. Second, a report exposing joint speeds and accelerations of the different robots at every time-frame and finally a report showing the current robot settings. Then the user will be offered to pick file locations to where \emph{csv} files with these three datasets should be created.
+    \item \emph{Operation Report.}  This command will run a simulation which analyzes the active operation and its descendants and produces read-outs of the data. First, a report outlining the energy usage of every robot at every time-frame. Second, a report exposing joint speeds and accelerations of the different robots at every time-frame and finally a report showing the current robot settings. Then the user will be offered to pick file locations to where \emph{csv} files with these three datasets should be created.
 
-    \item Show Optimization Graph. This command strives to demonstrate what the optimization graph looks. It uses the \class{GraphVisualizationService} to construct a model of the operation identical to the one used by the optimization process. It serializes this instance to a Graphviz format and uses \emph{dot.exe} to draw it to an image. Graphviz \cite{Graphviz} needs to be installed on the local machine and the \emph{dot.exe} executable must be in the path for the image to get produced.
+    \item \emph{Show Optimization Graph.} This command strives to demonstrate what the optimization graph looks. It uses the \cls{GraphVisualizationService} class to construct a model of the operation identical to the one used by the optimization process. It serializes this instance to a Graphviz format and uses \emph{dot.exe} to draw it to an image. Graphviz \cite{Graphviz} needs to be installed on the local machine and the \emph{dot.exe} executable must be in the path for the image to get produced.
+    
+    \item \emph{Interpolate Speed.} This command uses the operation \cls{OperationDurationInterpolator} class to adjust the speed of the operation to match the specified duration. A point operation must be active, and the duration must lie within the maximum and minimum duration attainable.
         
 \end{itemize}
 
@@ -44,24 +63,31 @@ In the previous chapter I described what is a command, how to create them and ho
 The optimization process consists of the main optimization routine and several modules that provide the required functionality for the algorithm which then glues it together. This chapter will first explain the optimization process and then focus on the supporting modules in the sub-sections. \\
 
 \begin{figure}[H]
-	\caption{Begin Optimization Dialog}
+	\caption{Optimization Dialog}
 	\centering
 	\includegraphics{dialog_beginoptimization}
 	\label{fig:DialogBeginOptimization}
 \end{figure}
 
-The user first triggers the optimization dialog (see Figure~\ref{fig:DialogBeginOptimization}) by clicking on the Optimize button provided by the Plugin. 
+The user first triggers the optimization dialog (see Figure~\ref{fig:DialogBeginOptimization}) by clicking on the Optimize button provided by the plugin. 
 The dialog allows the user to adjust parameters of the optimization process. 
-First, the system presents him with the operation which should be optimized, which is the operation he had currently set the as the active operation so that he has a chance to adjust this before starting the operation process. In the following text, I will refer to this operation as the root operation.
+First, the system presents him with the operation which should be optimized, which is the operation he had currently set the as the active operation so that he has a chance to adjust this before starting the optimization process. 
+In the following text, I will refer to this operation as the root operation.
 The user is also presented with the choice to optionally backup the operation which will create a copy of the root operation and then set the duplicate as the new root.
 Setting a specific cycle time in seconds will make the MILP model try to match the cycle time instead of minimizing it.
 Lastly, the debug option can provide the user with additional information from the MILP solver, explaining the solution, should he have troubles with the proposed schedule. \\
 
-The dialog uses the optimization service which is implemented in the \class{OptimizationService} class located in the \namespace{Tecno-ma-tix.Opti-mi-za-tion.Ser-vi-ces.Opti-mi-za-tion} namespace. This service is responsible for the main optimization flow described below. The service has one dependency, and that's an optimization provider (\class{IOptimizationProvider}). Included is the MILP model defined in Chapter~\ref{ch:milp_model} which optimizes cycle time. It is implemented in the \class{DefaultOptimizationProvider} class and the service mentioned above defaults to this provider. It can also be swapped out for a different provider which implements the \class{IOptimizationProvider} interface for example for a different criteria function. \\
+The dialog uses the optimization service which is implemented in the \class{OptimizationService} class located in the \namespace{Tecno-ma-tix.Opti-mi-za-tion.Ser-vi-ces.Opti-mi-za-tion} namespace. 
+This service is responsible for the main optimization flow described below. 
+The service has one dependency, and that's an optimization provider (\class{IOptimizationProvider}). 
+In this thesis I included an optimization provider which uses the MILP model defined in Chapter~\ref{ch:milp_model} which optimizes cycle time. 
+It is implemented in the \class{DefaultOptimizationProvider} class and the service mentioned above defaults to this provider. 
+It can also be swapped out for a different provider which implements the \class{IOptimizationProvider} interface for example for a different criteria function. \\
 
 When started, the optimization process will first aim to gather data about the root operation. It will first simulate the behavior of the root operation while the robots are set to maximum and minimum speeds to obtain the minimum and maximum duration of the individual child activities.\\
 
-Then an optimization graph is built by analyzing the operation tree. This graph is also augmented with the information about the simulation and any initial collisions the process might have encountered. After this initial batch of data is gathered the optimization cycle can start. In this loop, the graph is given to a solver which proposes a solution. The process adjusts the root operation to match the proposed solution, and the result is simulated. If there are no collisions, we have the best viable solution, and the cycle ends. Otherwise, we advance to the next round. To prevent an infinite loop, this can only be repeated a limited amount of times. \\
+Then an optimization graph is built by analyzing the operation tree. This graph is also augmented with the information about the simulation and any initial collisions the process might have encountered. After this initial batch of data is gathered the optimization cycle can start. In this loop, the graph is given to a solver which proposes a solution. The process adjusts the root operation to match the proposed solution, and the result is simulated. If there are no collisions, we have the best viable solution, and the cycle ends. Otherwise, we advance to the next round. To prevent an infinite loop, this can only be repeated a limited amount of times. 
+This constant is defined in the \cls{OptimizationService} class. \\
 
 When the process finishes the system will display a helpful report (see Figure~\ref{fig:DialogOptimizationResult}) presenting the most important information about the solution to the user. In the header the cycle time can be found and the body is filled with a graphical representation of the schedule.  
 
@@ -78,27 +104,27 @@ The simulation module is a wrapper around the kinematic simulation capability of
 
 To run a simulation, the system needs an operation as an input. Process Simulate will block the UI and compute the movement of the robots in the scope of the given operation, frame by frame. While simulating the player fires events, which the specific simulation can choose to subscribe to if they are relevant for its purpose. Usually, as the playback progresses, the simulation will store some data which when processed will form the output values. Events available range from the simulation being started or ending, operations beginning and ending to the individual time intervals at which the locations of all the objects within the study are computed. \\
 
-A simulation report is a type of simulation, output of which is a data table. This data can be exported into a \emph{csv} file. Reports are useful for debugging or gaining insight into the performance of the activities within the study. \\
+A report is a specialized type of simulation. This simulation gathers data while the simulation is in progress and processes them. This data can then be exported into a \emph{csv} file. Reports are useful for debugging or gaining insight into the performance of the activities within the study. \\
 
 The plugin comes with the following simulations implemented:
 
 \begin{itemize}
 
-\item Collision Simulation. This simulation is checking every frame if there is a collision between the specified collision pairs. The collision pairs can be adjusted in the \emph{Collision Viewer} panel in Process Simulate. The simulation will also track down the responsible operations which controlled the parts that collided. This is done by assigning to each operation a set of objects which can be moved by the operation and intersecting them with the set of objects that collided. It is assumed that a collision can happen only between two operation controlled objects, otherwise this is a fault of the robotic cell design which optimization can't fix and the collision is ignored.
+\item \emph{Collision Simulation.} This simulation is checking every frame if there is a collision between the specified collision pairs. The collision pairs can be adjusted in the \emph{Collision Viewer} panel in Process Simulate. The simulation will also track down the responsible operations which controlled the parts that collided. This is done by assigning to each operation a set of objects which can be moved by the operation and intersecting them with the set of objects that collided. It is assumed that a collision can happen only between two operation controlled objects, otherwise this is a fault of the robotic cell design which optimization can't fix and the collision is ignored.
 
-\item Energy Report. This report captures the simulated energy usage of the robots. Please note that the readings are only as accurate as the robot controller and using a dedicated controller from the manufacturer of the robots is recommended as the readings given by the default robot controller are inaccurate.
+\item \emph{Energy Report.} This report captures the simulated energy usage of the robots. Please note that the readings are only as accurate as the robot controller and using a dedicated controller from the manufacturer of the robots is recommended as the readings given by the default robot controller are inaccurate.
 
-\item Joint Speed Report. This report captures the speeds of the joints of the robots while performing the various tasks engulfed in the robotic operation.
+\item \emph{Joint Speed Report.} This report captures the speeds of the joints of the robots while performing the various tasks engulfed in the robotic operation.
 
-\item Duration Simulation. To capture how long it will take for a robot to perform the operation it is first needed for a simulation to run. This information will be captured by Process Simulate afterward, but if any changes happened to the study, it might be inaccurate. For this reason, to obtain accurate readings, this simulation will capture the durations right after the simulation finishes. It is also able to adjust the speed of the robots before running the simulation and restore the original values when done. 
+\item \emph{Duration Simulation.} To capture how long it will take for a robot to perform the operation it is first needed for a simulation to run. This information will be captured by Process Simulate afterward, but if any changes happened to the study, it might be inaccurate. For this reason, to obtain accurate readings, this simulation will capture the durations right after the simulation finishes. It is also able to adjust the speed of the robots before running the simulation and restore the original values when done. 
 
-\item Operation Speed Report. This report extracts the speeds the robots are set to run at while executing the particular operations. 
+\item \emph{Operation Speed Report.} This report extracts the speeds the robots are set to run at while executing the particular operations. 
 
 \end{itemize}
 
 \subsection{Graph}
 
-The heart of the optimization process is a model of the problem domain.  We defined this model in Chapter~\ref{ch:problem_statement} and the optimization graph is just a set of entities capturing it in code. The \class{OptimizationGraph} class represents the graph as a whole. The vertices and edges also have their classes, those are \class{OptimizationVertex} and \class{OptimizationEdge} respectively. Properties of all of the classes correspond to what we defined in Chapter~\ref{ch:problem_statement}. \\
+The heart of the optimization process is a model of the problem.  We defined this model in Chapter~\ref{ch:problem_statement} and the optimization graph is just a set of entities capturing it in code. The \class{OptimizationGraph} class represents the graph as a whole. The vertices and edges also have their classes, those are \class{OptimizationVertex} and \class{OptimizationEdge} respectively. Properties of all of the classes correspond to what we defined in Chapter~\ref{ch:problem_statement}. \\
 
 On top of holding data, the \class{OptimizationGraph} class also contains methods for serialization (JSON) and visualization of the graph. Out of the box, there are two visualization options available.
 
@@ -117,12 +143,12 @@ This functionality is being provided by the \class{GraphVisualizationService} wh
 
 First, the optimization graph is filled with vertexes which are the children of the root operation lying at the desired level, grouped by the robot which is assigned to perform them. In each group, the operations are ordered and a so-called "robot loop" is created, by linking the operations together in pairs, each one with the next. One exception to this rule is the edge between the first and the last operation, which are linked by a "robot loop reset" edge instead. \\
 
-\begin{figure}[H]
-	\caption{Projection of the operation tree onto a flat layer}
-	\centering
+\begin{sidewaysfigure}
+    \centering
+	\caption{Projection of the operation tree onto a flat layer. An operation link between two compound operations (blue) is projected into 9 projected links between points (purple).}
 	\includegraphics[width=1\textwidth]{graphprojection.pdf}
 	\label{fig:GraphProjection}
-\end{figure}
+\end{sidewaysfigure}
 
 The hardest part of the graph creation are the "link" edges which can appear at any level in the operation tree. Since we are flattening the tree into a graph, we need to project them into this new structure. 
 This process is different whether we flatten to the level of paths or points.  \\
@@ -137,11 +163,11 @@ If it leads outside its is ignored because it wouldn't have any impact on the ru
 
 In the latter case, when creating a graph at the level of points, the situation is similar, however, after forming the Cartesian product, we have to select the correct points from the paths. A custom recursive function \class{ProjectOntoGraph} achieves this. The projection which is a result of the function is illustrated in Figure~\ref{fig:GraphProjection}. This function first creates the Cartesian product $P = S \times T$ on the path level, as in the previous case. Then it selects the last or first point $\forall (from, to) \in P: edge = (last(from), first(to))$, depending if the set is coming from a source or a target operation respectively. And then create the corresponding $edge$ in the graph. For example on Figure~\ref{fig:GraphProjection} this function would project the blue operation link into the nine purple edges shown in the middle of the diagram.
 
-\subsection{Regulator}
+\subsection{Interpolator}
 
 % Intro
 
-The regulator is the main ingredient in the process responsible for taking the output of the optimization and adjusting the operation accordingly. Since how the component works and how its used is very closely tied together, I will explain both in this section. But before we jump to the algorithms we need to realize a few unintuitive facts which we determined experimentally. \\
+The interpolator is the main ingredient in the process responsible for taking the output of the optimization and adjusting the operation accordingly. Since how the component works and how its used is very closely tied together, I will explain both in this section. But before we jump to the algorithms we need to realize a few unintuitive facts which we determined experimentally. \\
 
 \begin{figure}[H]
 	\caption{Relation of operation duration to robot speed}
@@ -155,11 +181,11 @@ Firstly, as you can see in Figure~\ref{fig:SpeedVsDuration}, the relation betwee
 The second challenge stems from the fact that movement operations can have different precision associated with them. For example, when moving around a corner when the precision requirements are minimal, we can set the operation zone as "coarse" which will allow the robot to move to the next operation after reaching a region around the point specified by a configured tolerance. As opposed to a "fine" zone which will require the robot to move precisely to the specified point and only then it can advance to the next operation. Due to this, the speed of an operation can influence the following operation, and some operations are effectively skipped which implies that adjusting their speed will not change the duration. To address this, I added an upper bound to the MILP model for the operation duration. An operation which is being skipped will then have $\underline{d} = d = \overline{d}$, consequently the optimization engine won't try to adjust this operations duration and therefore its speed. \\
 
 % Class and namespaces
-To use the regulator to adjust speeds of an operation we first need to instantiate the \class{OperationDurationRegulator} class located in the \namespace{Tecnomatix.Optimization.Services.Regulation} namespace. First, we need to set the desired processing durations of the points which can be achieved by the \class{SetBlockDuration} method. Please note that the regulator is designed to adjust multiple operations at the same time because the process needs simulations to check that the adjusted speed resulted in the correct duration. Since simulations are by far the most expensive process, it is a good practice to use the least amount of simulations as possible. The regulator can also adjust operations in blocks in case it didn't make sense to adjust the operation individually, but only the cumulative duration was important. In this case, all the operations in the block will be adjusted to the same speed, and the sum of their durations will be matched to the specified desired duration. After the regulator has all the data, we can begin the calibration process by calling the \class{Adjust} method on the instance of the regulator class. This is a blocking operation due to the fact that the simulations are blocking the UI thread. \\
+To use the interpolator to adjust speeds of an operation we first need to instantiate the \class{OperationDurationInterpolator} class located in the \namespace{Tecnomatix.Optimization.Services.Interpolation} namespace. First, we need to set the desired processing durations of the points which can be achieved by the \class{SetBlockDuration} method. Please note that the interpolator is designed to adjust multiple operations at the same time because the process needs simulations to check that the adjusted speed resulted in the correct duration. Since simulations are by far the most expensive process, it is a good practice to use the least amount of simulations as possible. The interpolator can also adjust operations in blocks in case it didn't make sense to adjust the operation individually, but only the cumulative duration was important. In this case, all the operations in the block will be adjusted to the same speed, and the sum of their durations will be matched to the specified desired duration. After the interpolator has all the data, we can begin the calibration process by calling the \class{Adjust} method on the instance of the interpolator class. This is a blocking operation due to the fact that the simulations are blocking the UI thread. \\
 
 % How it works
 
-First of all the regulator holds a lower and upper bound for the speed and duration of each operation. These bounds are set to a speed of 1 (minimum) and the speed of 100 (maximum) and the durations observed for those speeds. Similarly to an interpolation search, the regulator will iterate until it finds an acceptable solution or decides that it is impossible or impractical to continue. In the loop, the first action is to make a prediction of the speed based on the upper and lower bounds and the desired duration. At first, I considered linear interpolation (Equation~\ref{eq:LinearInterpolationPrediction}), but because the relation isn't linear as shown on Figure~\ref{fig:SpeedVsDuration}, binary halving (Equation~\ref{eq:BinaryPrediction}) was used instead because it should converge in fewer iterations in most cases. \\
+First of all the interpolator holds a lower and upper bound for the speed and duration of each operation. These bounds are set to a speed of 1 (minimum) and the speed of 100 (maximum) and the durations observed for those speeds. Similarly to an interpolation search, the interpolator will iterate until it finds an acceptable solution or decides that it is impossible or impractical to continue. In the loop, the first action is to make a prediction of the speed based on the upper and lower bounds and the desired duration. At first, I considered linear interpolation (Equation~\ref{eq:LinearInterpolationPrediction}), but because the relation isn't linear as shown on Figure~\ref{fig:SpeedVsDuration}, binary halving (Equation~\ref{eq:BinaryPrediction}) was used instead because it should converge in fewer iterations in most cases. \\
 
 \begin{equation} \label{eq:LinearInterpolationPrediction}
     prediction = S_{min} + \frac{D}{D_{max}-D_{min}} \times (S_{max}-S_{min})
@@ -174,6 +200,7 @@ After the algorithm makes predictions for the whole batch, the next step is to m
 Some readers, acquainted with Process Simulate, might be wondering why we don't convert the movement kind of the operation from joint speed to motion type and write the proposed duration in there. The reason is that the motion type duration only affects the period of the movement, and any OLP commands or welding action take extra time on top of that. Ideally, if we could find out the length of the static part, we could subtract it from the total duration, and still write out the times as motion type. Alas, there is no way to determine the length of the two distinct parts, and therefore we can't use that feature and have to discover the joint speed by simulation. \\
 
 \subsection{Generator}
+\label{ch:generator}
 
 The generator piece does as the name suggests. It allows for the programmatic generation of random optimization graphs which can be used for automated testing. These graphs are not guaranteed to be feasible. \\
 

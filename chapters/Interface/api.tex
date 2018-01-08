@@ -69,12 +69,10 @@ public class MyCommand : TxButtonCommand
 
 \section{API}
 
-This section is dedicated to acquanting the reader with the most important classes in the \cls{Tecnomatix.Engineering.dll} library. 
+This section is dedicated to acquainting the reader with the most important classes in the \cls{Tecnomatix.Engineering.dll} library. It is not the only library available for the plugin developers, but apart from edge-cases it's the only one developers need. It allows developers to extract information from the application instance that loaded the plugin and currently the opened project. It includes routines to control some of the functions of the application.
 
 \subsection{TxApplication}
-
-The \cls{TxApplication} is a class containing static properties bound to the current application instance.
-This is the main entry point the API.
+\cls{TxApplication} is a static class which serves as the main entry point to the application. This class can be readily described as the root of a tree. It holds instances of sub-services in its static properties bound to the current application instance. It also contains routines which control application specific behavior. In Figure~\ref{fig:CodeTxApplication} I picked out the most important properties and presented their signature, as I believe that for a person with development experience this is the most valuable information, and the easiest to imagine.
 
 \begin{figure}[H]
     \caption{TxApplication API}
@@ -93,25 +91,26 @@ public sealed class TxApplication
     \label{fig:CodeTxApplication}
 \end{figure}
 
-\cls{ActiveDocument} is the most important property of this object.
-It contains information about the current document and allows applications to manipulate it.
-See \cls{TxDocument}.
+\begin{itemize}
 
-\cls{ActiveSelection} ... .
+\item \cls{ActiveDocument} is the pivotal property of this object.
+It contains information about the currently opened study and allows the plugin to manipulate it. The features of this object are described in Chapter~\ref{ch:TxDocument}, which talks about the \cls{TxDocument} type.
 
-\cls{ApplicationEvents} property provides a way of getting a callback when the application is closing and so on.
-See \cls{TxApplicationEvents}.
+\item \cls{ActiveSelection} allows the plugin to see what the user selected or modify the selection. This feature is especially useful when used as part of the plugins user interface, allowing the user to pick inputs for the plugin by selecting them in the application.
 
-\cls{Options} contains a hierarchy of objects used to retrieve and set application options.
-See \cls{TxOptions}.
+\item \cls{ApplicationEvents} property provides binding actions to important application events. Chapter~\ref{ch:TxApplicationEvents} goes into more detail about how to use this property.
 
-\cls{StatusBarMessage} property can be used to relay status information to the user.
-The text set to this property will appear on the application status bar.
+\item \cls{Options} contains a hierarchy of objects used to retrieve and set application options. These mimic the options found in the \cls{Settings} dialog of the application. Chapter~\ref{ch:TxOptions} goes into more detail.
 
-For performance reasons, viewers may not always display the current data.
-The method \cls{RefreshDisplay()} causes all viewers to display the current data.
+\item \cls{StatusBarMessage} is a simple String. Modifying this property will make the text appear in the status bar area of the application. It is a simple, but effective, way to communicate with the user unobtrusively.
+
+\item \cls{RefreshDisplay()} causes all panels in the application to redraw using the latest data.
+
+\end{itemize}
 
 \subsection{TxSelection}
+
+The \cls{TxSelection} class controls the current selection. All different kinds of items can be selected simultaneously. For this reason, the API includes this specialized class allowing the developers to interact with all kinds of selections fairly easily. In Figure~\ref{fig:CodeTxSelection} I prepared a filtered definition of the class.
 
 \begin{figure}[H]
     \caption{TxSelection API}
@@ -135,16 +134,24 @@ public sealed class TxSelection{
     \label{fig:CodeTxSelection}
 \end{figure}
 
-\cls{GetOrderedItems()} gets the objects that are currently selected.
-Returns only the loaded objects, in their engineering representation in the order they were selected in.
-\cls{GetAllItems()} returns the same thing, but does not guarantee order.
-\cls{GetPlanningItem()} returns planning representations like \cls{TxPlanningPart} or \cls{TxPlanningResource}, whereas \cls{GetAllItems()} returns engineering representations like \cls{TxRobot} or \cls{TxComponent}.
+\begin{itemize}
 
+\item \cls{GetOrderedItems()} gets the objects that are currently selected.
+In addition to that, this routine returns only the loaded objects, in their engineering representation in the order they were selected.
 
-\cls{GetLastPickedLocation()} returns coordinates of the last picked object.
+\item \cls{GetAllItems()} returns the same information, but does not guarantee order.
 
+\item \cls{GetPlanningItem()} returns planning representations like 
+\cls{TxPlanningPart} or \cls{TxPlanningResource}, in contrast to the aforementioned routines which return engineering representations like \cls{TxRobot} or \cls{TxComponent}.
+
+\item \cls{GetLastPickedLocation()} returns coordinates of the last picked object.
+
+\end{itemize}
 
 \subsection{TxApplicationEvents}
+\label{ch:TxApplicationEvents}
+
+The \cls{TxApplicationEvents} class wraps multiple application events. The events include the closing of the application which the plugin can use to clean up temporary resources. The application exit request can also be intercepted should the user have some unsaved work in the plugin. You can see the class definition in Figure~ref{fig:CodeTxApplicationEvents}. Additionally, Figure~\ref{fig:CodeTxApplicationEventsUsage} shows how the events in this class are used.
 
 \begin{figure}[H]
     \caption{TxApplicationEvents API}
@@ -160,38 +167,43 @@ public sealed class TxApplicationEvents
     \label{fig:CodeTxApplicationEvents}
 \end{figure}
 
-\cls{Exiting} Occurs when the application is about to exit.
+\begin{itemize}
 
-\cls{ExitRequest} Occurs when the application requests to exit.
-To reject the request to exit, specify \cls{false} for the \cls{Approve} field of \cls{Tecnomatix.Engineering.TxApplication\_ExitRequestEventArgs}.
+\item \cls{Exiting} Occurs when the application is about to exit.
 
-\cls{Closing} Occurs when the loaded project is closed.
+\item \cls{ExitRequest} Occurs before the application is about to exit.
+To reject the request to exit, specify \cls{false} for the \cls{Approve} field of the event arguments.
 
-Usage:
+\item \cls{Closing} Occurs when a project is closed.
+
+\end{itemize}
 
 \begin{figure}[H]
     \caption{TxApplicationEvents Usage}
     \centering
     \begin{minted}[breaklines]{csharp}
-private void Form1_Exiting(object sender, TxApplication_ExitingEventArgs args)
+class Demo()
 {
-    FinishWork();
-}
-private void Form1_ExitRequest(object sender, TxApplication_ExitRequestEventArgs args)
-{
-    args.Approve = !working;
+    public Demo()
+    {
+        TxApplication.ApplicationEvents.Exiting += (sender, e) => {
+            Save();
+        };
+        TxApplication.ApplicationEvents.ExitRequest += (sender, e) => {
+            e.Approve = !unsavedWork;
+        };
+    }
 }
     \end{minted}
     \label{fig:CodeTxApplicationEventsUsage}
 \end{figure}
 
 \subsection{TxOptions}
+\label{ch:TxOptions}
 
-Provides access to the application options as they are defined in the Options dialog.
+The \cls{TxOptions} provides access to the application options as they mirror the options in the \cls{Options} dialog.
 These options include collision checking configuration, units used, simulation and so on.
-Notably spot welding options aren't available in RobotExpert. 
-
-Probably only option useful to plugins is:
+Please note that spot welding options aren't available in RobotExpert, only in Process Simulate. Figure~\ref{fig:CodeStopOnCollision} shows the usage of and points out the option I found the most useful. It ensures the simulation player stops playing when it reaches the first collision.
 
 \begin{figure}[H]
     \caption{TxOptions Usage}
@@ -202,14 +214,14 @@ TxApplication.Options.Collision.StopOnCollision = true;
     \label{fig:CodeStopOnCollision}
 \end{figure}
 
-
-Which ensures the simulation player stops playing when it reaches the first collision.
-
 \subsection{TxDocument}
+\label{ch:TxDocument}
 
-The \cls{TxDocument} object is the common root of all model objects: physical
-objects, operations, manufacturing features, and robotic programs. It provides
-access to objects that have a single instance per document.
+The \cls{TxDocument} class represents a study. 
+When talking about the \cls{TxApplication.ActiveDocument} object this would be the currently open study. 
+Under the document, we can find all physical
+objects, operations, manufacturing features, and robotic programs. 
+It also facilitates access to objects that have a single instance per document.
 
 \begin{figure}[H]
     \caption{TxDocument API}
@@ -228,25 +240,32 @@ public sealed class TxDocument
     \label{fig:CodeTxDocument}
 \end{figure}
 
-\cls{OperationRoot} is the root of the operation tree
-\cls{PhysicalRoot} is the root of the physical object tree
-\cls{MfgRoot} is the root of the manufacturing features tree.
+\begin{itemize}
 
-The \cls{ColisionRoot} is the root of the collision pairs.
-It is used to determine where the workspace currently contains a colision.
+\item \cls{OperationRoot} is the root of the operation tree
 
-The \cls{SimulationPlayer} is used to simulate operations and events.
+\item \cls{PhysicalRoot} is the root of the physical object tree
+
+\item \cls{MfgRoot} is the root of the manufacturing features tree.
+
+\item \cls{ColisionRoot} is the root of the collision pairs.
+It is used to determine where the workspace currently contains a collision.
+
+\item \cls{SimulationPlayer} is used to simulate operations and events.
 At any given moment there is a single, current simulation player, with which all commands and viewers work.
+\end{itemize}
 
 \subsection{Operations}
+
+Operations in Process Simulate inherit the \cls{ITxOperation} interface. When they have children, as all operations except on the point level do, they also implement the \cls{ITxObjectCollection} interface which serves as a nongeneric \cls{List} specific to the Process Simulate .NET API. All operations have a name and a description.
 
 \subsubsection{TxOperationRoot}
 
 This class is the root of all operations.
 Its children are usually of type \cls{TxCompoundOperation}.
-You can query all children with the \cls{GetXDescendants()} methods.
-Operations can't be created using a constructor.
-To create a new operation use the \cls{CreateXOperation()} on a class that implements \cls{ITxOperationCreation} like \cls{TxOperationRoot}, for the specific operation type you are trying to create.
+We can query all children with the \cls{GetAllDescendants()} or \cls{GetDirectDescendants()} methods.
+Operations can't be created using the new keyword invoking a constructor.
+To create a new operation use the \cls{CreateXOperation()} on a class that implements \cls{ITxOperationCreation}, like for example \cls{TxOperationRoot}. The X in \cls{CreateXOperation()} is the specific operation type you are trying to create, and the classes contains methods for all operation types. For example, if we wanted to create a \cls{GenericRoboticOperation} we would use the  \cls{CreateGenericRoboticOperation} method.
 The created operation still needs to be inserted into a specific place in the operation tree.
 
 \begin{figure}[H]
@@ -269,47 +288,20 @@ foreach (ITxOperation op inTxApplication.ActiveDocument.OperationRoot.GetDirectD
 
 \subsubsection{TxCompoundOperation}
 
-Represents several operations grouped together into a single entity which together make a process.
-This class implements is directly enumerable.
-Like all operations compound operation has also a name and a description.
-
-\begin{figure}[H]
-    \caption{TxCompoundOperation API}
-    \centering
-    \begin{minted}{csharp}
-TxCompoundOperation compoundOp = ...;
-foreach (ITxOperation op in compoundOp)
-{
-
-}
-    \end{minted}
-    \label{fig:CodeTxCompoundOperation}
-\end{figure}
-
+This operation groups a set of operations (its children) into a logical group. They can also specify dependencies and offsets within the parent.
 
 \subsubsection{TxContinuousRoboticOperation}
 
-Represents an ordered list of operations each with a certain duration that as a whole create a sequence that will be carried out by the robot.
-Continuous robotic operation contains a set of child links, each having a reference to a from and to operations.
+This path operation contains an ordered list of points.
+It has a robot assigned which will carry out the whole sequence of the points.
+In the object model, it contains a set of child links, each having a reference to a source and target operations.
 These links are read only but can be read and manipulated using the \cls{GetChildAt()} and \cls{MoveChildAfter()} functions.
-Timing offsets and durations are read-only and can't even be changed in RobotExpert.
-
-\begin{figure}[H]
-    \caption{TxContinuousRoboticOperation API}
-    \centering
-    \begin{minted}[breaklines]{csharp}
-TxContinuousRoboticOperation roboOp = ...;
-IEnumerable<ITxOperation> children = Enumerable.Range(0, roboOp.Count)
-    .Select(roboOp.GetChildAt)
-    .OfType<ITxOperation>();
-    \end{minted}
-    \label{fig:CodeTxContinuousRoboticOperation}
-\end{figure}
+Timing offsets and durations are read-only which are captured after a simulation. Changing operation speeds won't recalculate this value, a new simulation needs to be performed. 
 
 \subsubsection{TxRoboticViaLocationOperation}
 
 This operation is used to avoid obstacles since a normal operation goes for a direct approach to the target point which can result in collisions.
-Specifies a point to which the robots head should navigate.
+It simply navigates the robots head to a designated point.
 
 \subsubsection{TxObjectFlowOperation}
 

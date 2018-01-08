@@ -2,14 +2,36 @@
 \label{ch:conclusion}
 \graphicspath{{chapters/Conclusion/}}
 
-what did we do
+The main goal of my thesis was to explore how we can increase the effectivity of manufacturing systems, by integrating a CAD software designed for simulating manufacturing processes with an optimization algorithm. \\
+
+First, I had to familiarize myself with the Process Simulate application and the manufacturing domain. I examined the features of the application and created a simple assembly line consisting of three robots working on a product that moved on a conveyor belt. \\
+
+Then I had to investigate options for creating plugins for the software. This part could have been much easier if not for the fact that documentation for the Tecnomatix suite is practically non-existent. I created a guide on how to create new commands that will appear in the ribbon bar of the application. I also set up a development environment where the build process will automatically produce a library which the application can read and start it so that it could see the results quickly. \\
+
+I explored the functionality officially available to developers and documented them. For specific capabilities, like reading out the energy usage of robots, I was able to find an undocumented way to retrieve this information. Based on the available functionality, which was unfortunately quite limiting, I designed a process that analyzes the open study and uses several different algorithms determine the optimal operation settings. This process can use an optimization module which defines the criteria for optimality. I devised a MILP model that optimizes the cycle time of an operation and transformed it into code. Together these functions form a helper the users can use to make sure their robotic cells produce products at maximum efficiency. \\
+
+To test the correctness of the plugin, and its performance, I created a generator of artificial models with variable complexity. 
+I used the generator to generate a hundred models for each complexity level and allow the algorithm to solve them. The performance of the solver was measured and analyzed. I found the performance of the solver satisfying, especially compared to the time spent by simulation, and therefore a heuristic algorithm was not implemented. \\
+
+The plugin was also tested manually with practical examples of robotic cells provided by engineers experienced in the field. \\
 
 \section{Future work}
 
-The schedule could be optimized with different goals in mind, for example: cycle time or energy consumption (leveraging the robots sleep modes)
+Unfortunately, I can't claim to have solved the topic of optimization in manufacturing or saved billions of any currency. 
+A lot more work has to be done on this application for it to be usable in a  professional environment.
+As it usually is, progress, especially in science, is incremental.
+As I was building on the shoulders of giants, I'd like to propose few areas where to take this work in the future.
 
-\cite{EnergyOptimisationBukata}
+\begin{itemize}
+    \item \emph{Energy Consumption Optimization}. Even within optimal cycle time, we can look at sleep modes and operation speeds to reduce energy usage. Some preliminary work was already made \cite{EnergyOptimisationBukata} with good results.
 
-- interpolation search more accurate predictions
+    \item \emph{More accurate predictions for the interpolation search algorithm}. Predicting better speeds based the duration could result in fewer cycles and therefore fewer simulations which take most of the time in the duration of the optimization process.      
 
-\textbf{+1 page}
+    \item \emph{Specialized behavior for different scenarios}. Different kinds of operations have to be treated in their specific way. Handling as many kinds as possible could significantly improve the flexibility of the algorithm and also its results.
+    
+    \item \emph{More granular collision handling}. Currently, If there is a collision between two operations the operations are forbidden to be operating simultaneously at any stage of the execution. A more precise algorithm could track down the problematic section of the operation make sure only that portion is restricted so that the operations can still overlap, albeit partially.
+    
+\end{itemize}
+
+
+

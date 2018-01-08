@@ -1,0 +1,22 @@
+\begin{tikzpicture}
+\begin{axis}[
+%    title={Relation of operation duration to robot speed},
+    xlabel={Complexity (robots)},
+    ylabel={Duration (milliseconds)},
+    xmin=0, xmax=40,
+    ymin=0, ymax=22500,
+    xtick={0,10,20,30,40},
+    ytick={0,2500,5000,7500,10000,12500,15000,17500,20000,22500},
+    legend pos=north west,
+    ymajorgrids=true,
+    grid style=dashed,
+]
+ 
+\addplot[
+    color=blue,
+    mark=square,
+    ]
+    table[x={complexity}, y={duration}]
+    {chapters/Experiments/graph.dat};
+\end{axis}
+\end{tikzpicture}

@@ -2,16 +2,29 @@
 \label{ch:experiments}
 \graphicspath{{chapters/Experiments/}}
 
-The former validation of this work was split into several parts. Due to the complexity of the problem domain not all of the testing and validation could be performed automatically and compared with related works. For this reason user testing was one of the main pillars in this process. \\
+Due nature of the problem not all of the testing and validation could be performed automatically and compared with related works. 
+For this reason, I split the formal validation of this work into two parts. 
+First I assess the performance of the MILP model and determine whether a heuristic needs to be used instead. 
+Then I perform manual testing evaluating the quality of the optimization process on predefined test scenarios.
 
-Firstly the performance of the included optimization algorithm was tested. For this I developed an algorithm to generate test instances on which the solver could be benchmarked. Then several real test instances were prepared by seasoned engineers in the assembly line design area, illustrating key problems we could encounter in the real world, which was important as this work is focusing on real world application. Lastly the plugin for Process Simulate which I created in this thesis was tested with the users. The main monitored were user experience, speed and mainly the correctness of the results. \\
+\section{Performance Testing}
 
-To verify the validity of the included optimization model 40 problem instances of increasing complexity were randomly generated, each of them corresponds to a robotic cell with $n$ co-operating robots. Each robot has $n + 2$ actions to act out and the overall system includes $n$ collisions. To ensure the instances aren't trivial also $n$ inter-robot dependencies are added. \\
+To benchmark the performance of the provided optimization provider, which consists of a MILP model and a selected MILP solver for the model, I chose to feed it randomly generated models and measure the time it took the provider to come up with a solution. 
+The randomly generated models were created by the generator module which is explained in detail in Chapter~\ref{ch:generator}. 
+I used this module to generate 100 random models for each complexity setting and then averaged the results into the number which you can see in the Table~\ref{tbl:MILPBenchmark}.
+A complexity setting of $n$ corresponds to a robotic cell with $n$ co-operating robots. Each robot has $n + 2$ actions to act out, and the overall system includes $n$ collisions. To ensure the instances aren't trivial also $n$ inter-robot dependencies are added. 
+I tested complexity settings 1 to 40 as the higher complexity settings took too much time to process 100 times and having 40 robots is not practical in a single robotic cell. \\
 
-The energy optimization problem was formulated as an Mixed Integer Linear Programming problem. The work allows for easy replacement of the MILP solver, however the presented tests were solved using the open source engine LP\_SOLVE \cite{LPSolve}. The computer running the benchmarks was equipped with Intel Xeon E3-1230v2 @ 3.30 GHz \cite{BeastCPUIntelARK} and 32 GB of RAM. \\
+I run the benchmarks on a computer equipped with Intel Xeon E3-1230v2 @ 3.30 GHz \cite{BeastCPUIntelARK} and 32 GB of RAM. 
+The architecture of the plugin allows for a smooth replacement of the MILP solver. 
+However, the presented benchmarks were performed using the open source engine LP\_SOLVE \cite{LPSolve}. \\
 
-\begin{table}[ht]
-    \label{tbl:milpspeed}
+Based on the results shown in Figure~\ref{fig:MILPBenchmark} obtained I decided that a heuristic solution wasn't needed for this model as even in the most extreme case of 40 robots the solver takes only 22 seconds.
+On the other hand, the architecture of the plugin doesn't bind the optimization providers to a MILP solver, and for more complex models a heuristic solution can be used.
+Considering the duration of the simulations in the optimization process, 22 seconds for a run of the optimization provider is an acceptable value.
+
+
+\begin{table}[h]
     \centering
     \begin{tabular}{|c|c|c|c|}
         \hline
@@ -21,8 +34,134 @@ The energy optimization problem was formulated as an Mixed Integer Linear Progra
         \hline
     \end{tabular}
     \caption{MILP Solver Benchmark}
+    \label{tbl:MILPBenchmark}
 \end{table}
 
-TODO User testing \\
+\begin{figure}[H]
+	\centering
+	\input{chapters/Experiments/graph.tex}
+	\caption{Growing duration with complexity of the model}
+	\label{fig:MILPBenchmark}
+\end{figure}
 
-\textbf{+2 pages}
+
+\section{User Testing}
+
+Unit testing is preferable when it comes to assuring the quality of components of an application.
+However, components that interact with Process Simulate need a study to be loaded. 
+That, unfortunately, requires user input and can't be done programmatically because of it, therefore can't be unit tested.
+In this chapter, I present the experiments that were carried out for the components that require a study and the optimization process overall.  \\
+
+The testing was performed two different studies. 
+A group of engineers from a professional environment provided the first, realistic, study seen on Figure~\ref{fig:ProcessSimulate} ("weld test study").
+And the second was a custom study created for testing collisions ("collision test study").
+Unfortunately, both contain proprietary information and can't be released as a part of this thesis. \\
+
+The weld test study simulates a robotic cell, where the product comes in a box.
+The central robot picks up the robot from the box and places it on a turning table.
+The table turns and allows access to the product to two welding robots which perform some welding on the side of the product. 
+Then the table turns back, and the central robot picks up the product again. 
+This time it puts it into a stationary punch, holding it in place, while the punch makes a hole.
+Meanwhile one of the welding robots puts his tool into a grinding device which cleans up the residue from welding.
+After the hole is punched, the central robot transfers the product into another stationary machine and then back into the box.
+Multiple processes are executed at parallel showcasing all types of links and operations in the study. \\
+
+The collision test study consists of two robots facing each other, one moving his tool frame on a line ("line operation"), while the other is periodically crossing the line ("cross operation").
+Each of the paths is made out of four operations.
+Depending on the operation speed the robots would either collide or not.
+Of course, collision detection is enabled and configured with appropriate collision pairs. \\
+
+\subsection{Interpolator}
+
+The Interpolator component was manually tested according to the following scenario: 
+
+\begin{itemize}
+    \item Open Process Simulate
+    \item Load the weld test study
+    \item Select a point operation and mark it as active
+    \item Invoke the \cls{Interpolate Speed} command and enter a value between the maximum and minimum
+    \item Write down the resulting operation speed and compare to expectations
+\end{itemize}
+
+A point operation was selected from the test study.
+When running it at minimum speed (10\%) a maximum duration of 3.1s was obtained and likewise at maximum speed (100\%) a minimum duration of 0.34s was observed. 
+I selected the duration of 2s as the target and executed the command.
+When the process has finished I observed a duration of 2.00s and the interpolated speed of 16.42 in the \cls{Path Editor} window.
+
+\subsection{Graph Builder}
+
+The Graph Builder component was manually tested according to the following scenario: 
+
+\begin{itemize}
+    \item Open Process Simulate
+    \item Load the weld test study
+    \item Select a compound operation and mark it as active
+    \item Invoke the \cls{Show Optimization Graph} command
+    \item Compare the presented diagram to the operation tree
+\end{itemize}
+
+When testing the graph builder, I selected the top-most compound operation representing the whole welding process of using multiple robots cooperating. 
+After executing the command, I compared each node and the values within. 
+More importantly, I made a point of checking all the edges to match operation tree.
+
+\subsection{Collision Analysis}
+
+The Collision Analysis component was manually tested according to the following scenario: 
+
+\begin{itemize}
+    \item Open Process Simulate
+    \item Load the collision test study
+    \item Select the compound operation and mark it as active
+    \item Invoke the \cls{Analyze Collisions} command
+    \item Compare the result with the expected outcome (1 collision)
+    \item Adjust the operation speed of the line operation to 50\%
+    \item Invoke the \cls{Analyze Collisions} command
+    \item Compare the result with the expected outcome (0 collisions)
+\end{itemize}
+
+The \cls{Analyze Collisions} command outputs a list of operations that were being executed at the time of the collision and had a relationship with one of the objects causing the collision.
+It is therefore important to also check the operation names to match the expectation.
+
+\subsection{Operation Backup}
+
+The Operation Backup component was manually tested according to the following scenario: 
+
+\begin{itemize}
+    \item Open Process Simulate
+    \item Load the weld test study
+    \item Select any operation and mark it as active
+    \item Invoke the \cls{Clone Operation} command
+    \item Compare the operation trees by simulation
+    \item Compare the links to resources and appearances
+\end{itemize}
+
+After testing with the users, I found out that even though the operation tree copy is perfect, specific bindings, namely appearances, are not always preserved.
+That is something that I can't add to the process because there is no API for manipulating appearances.
+I sincerely hope the Process Simulate team will fix this in a future version of the application since it also affects other capabilities using this API like drag \& drop or copy \& paste. 
+
+\subsection{Optimization Process}
+
+The optimization process was tested on both studies to highlight specific aspects of the optimization algorithm. 
+The testing process included the following scenarios.
+
+\begin{itemize}
+    \item Open Process Simulate
+    \item Load the collision test study
+    \item Select the root operation and mark it as active
+    \item Invoke the \cls{Optimize Operation} command and click "Optimize"
+    \item Assess the quality of the solution (a valid solution without collisions) 
+\end{itemize}
+
+In the collision test the algorithm found a solution, avoiding possible collisions but increasing the root operation duration.
+This is not the minimum possible cycle time, but the minimum cycle time that could have been found with the "safe" collision resolution method used.
+
+\begin{itemize}
+    \item Open Process Simulate
+    \item Load the weld test study
+    \item Select the root operation and mark it as active
+    \item Find an operation on the critical path and decrease its speed to 50\%
+    \item Invoke the \cls{Optimize Operation} command and click "Optimize"
+    \item Assess the quality of the solution (all operations on the critical path have speed set to 100\%) 
+\end{itemize}
+
+The final test for the plugin will be a trial run in a professional environment, which will determine the future direction of this project. 

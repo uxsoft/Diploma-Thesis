@@ -98,18 +98,18 @@
 {\bfseries\huge} 
 {
     \color{darkaccent}
-    \raisebox{0em}{
+    \raisebox{0cm}{
         \rule{0.35cm}{1em}
     }
     \color{black}
     \sffamily
     \chaptertitlename \ \Huge\thechapter
 } 
-{-0.75em}
+{-1.5em}
 {
     \color{darkaccent}
-    \raisebox{-2pt}{
-        \rule{0.35cm}{1.5em}
+    \raisebox{0cm}{
+        \rule{0.35cm}{3em}
     }
     \sffamily
     \color{lightaccent}
@@ -189,7 +189,9 @@
 }
 
 \newcommand{\cls}[1]{
+    \noexpandarg
     \StrSubstitute{#1}{/}{$\backslash$\-}[\clscontent]
-    \StrSubstitute{\clscontent}{-}{\-}[\clscontent]
+    \expandafter\StrSubstitute\expandafter{#1}{_}{$\_\-}[\clscontent]
+    \expandafter\StrSubstitute\expandafter{\clscontent}{-}{\-}[\clscontent]
     \emph{\StrSubstitute{\clscontent}{.}{.\-}}
 }

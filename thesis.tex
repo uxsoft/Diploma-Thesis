@@ -13,6 +13,7 @@
 \usepackage{pdfpages}
 \usepackage{caption}
 \usepackage{csquotes}
+\usepackage{rotating}
 \usepackage{pgfplots}
 \usepackage{float}
 \usepackage{minted}
@@ -22,6 +23,7 @@
 
 \usemintedstyle{vs}
 \pgfplotsset{compat=1.15}
+\setcounter{secnumdepth}{5}
 
 \definecolor{aliceblue}{RGB}{240,248,255}
 \definecolor{wonderland}{RGB}{15,123,196}
@@ -71,7 +73,7 @@
 \newcommand\Supervisor{Ph.D. Přemysl Šůcha}
 
 \hyphenation{
-    IOPti-mi-za-tion-Pro-vi-der
+    IOPti-mi-za-tion-Pro-vi-der Nej-prve robo-ti-ckou opti-ma-li-za-ci po-sky-tu-je
 }
 
 \begin{document}
@@ -140,7 +142,7 @@
 
 
 \input{appendixes/Abbreviations/chapter.tex}
-\input{appendixes/Manual/chapter.tex}
+% \input{appendixes/Manual/chapter.tex}
 \input{appendixes/CDContents/chapter.tex}
 
 \end{document}
